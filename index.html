@@ -1,0 +1,55 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lotto Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="tokens.css"><style>
+/* Hallmark · macrostructure: Workbench · tone: technical · anchor hue: phosphor green 145
+ * genre: atmospheric · theme: Terminal · nav: N8 Terminal · footer: Ft5 Statement · enrichment: none (typography only)
+ * pre-emit critique: P4 H4 E4 S4 R4 V3 · slop test: not run (reference gates not loaded) */
+*{box-sizing:border-box}html,body{overflow-x:clip}
+body{margin:0;background:var(--color-paper);color:var(--color-ink);font:400 var(--text-md)/1.55 var(--font-body)}
+.wrap{max-width:46rem;margin:auto;padding:var(--space-md)}
+.bar{display:flex;align-items:center;gap:var(--space-md);flex-wrap:wrap;padding-bottom:var(--space-md);border-bottom:var(--rule-w) solid var(--color-rule);font-size:var(--text-sm)}
+.prompt{color:var(--color-accent);font-family:var(--font-display)}
+nav{display:flex;gap:var(--space-sm)}
+button{font:500 var(--text-sm) var(--font-display);white-space:nowrap;color:var(--color-ink);background:none;border:var(--rule-w) solid var(--color-rule);border-radius:var(--radius-sm);padding:var(--space-sm) var(--space-md);cursor:pointer;transition:background var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out)}
+button:hover,button.is-hover{background:var(--color-paper-2)}button:active,button.is-active{transform:translateY(1px)}
+button:focus-visible,button.is-focus{outline:2px solid var(--color-focus);outline-offset:2px}
+button[aria-pressed=true]{background:var(--color-accent);color:var(--color-accent-ink);border-color:var(--color-accent)}
+button:disabled{opacity:.4;cursor:not-allowed}
+h1{font:700 var(--text-display)/1 var(--font-display);margin:var(--space-xl) 0 var(--space-md);overflow-wrap:anywhere;min-width:0;letter-spacing:-.02em}
+.W{color:var(--color-accent)}.L{color:var(--color-lose)}
+.m{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-md);margin:0 0 var(--space-xl);padding:var(--space-md) 0;border-block:var(--rule-w) solid var(--color-rule)}
+.m dt{color:var(--color-mute);font-size:var(--text-sm)}.m dd{margin:0;font:500 var(--text-lg) var(--font-display);overflow-wrap:anywhere}
+.draw{margin-bottom:var(--space-xl);animation:in var(--dur-base) var(--ease-out)}
+.draw>header{display:flex;justify-content:space-between;gap:var(--space-md);flex-wrap:wrap;align-items:baseline;border-bottom:var(--rule-w) solid var(--color-rule);padding-bottom:var(--space-sm)}
+h2{font:700 var(--text-lg) var(--font-display);margin:0}time{color:var(--color-mute);font-size:var(--text-sm)}
+.nums{margin:var(--space-md) 0}.n{display:inline-block;min-width:2.25rem;text-align:center;margin:0 var(--space-xs) var(--space-xs) 0;padding:var(--space-xs) var(--space-sm);border:var(--rule-w) solid var(--color-rule);border-radius:var(--radius-sm);font-family:var(--font-display)}
+.n.hit{background:var(--color-accent);border-color:var(--color-accent);color:var(--color-accent-ink);font-weight:700}
+.draw .nums .n{border-color:var(--color-ink)}
+ul{list-style:none;margin:0;padding:0}li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--space-sm);align-items:center;padding:var(--space-sm) 0;border-top:var(--rule-w) solid var(--color-rule)}
+li .r{text-align:right;font-size:var(--text-sm)}
+footer{border-top:var(--rule-w) solid var(--color-rule);padding:var(--space-lg) 0;color:var(--color-mute);font-size:var(--text-sm)}
+.msg{color:var(--color-mute)}.msg.err{color:var(--color-lose)}
+@keyframes in{from{opacity:0}to{opacity:1}}
+@media(max-width:420px){.m{grid-template-columns:minmax(0,1fr)}li{grid-template-columns:minmax(0,1fr)}li .r{text-align:left}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><div class="wrap">
+<header class="bar"><span class="prompt">lotto@tracker:~$ show</span><nav aria-label="Range"><button data-r="latest">--latest</button><button data-r="week">--week</button><button data-r="all">--all</button></nav></header>
+<main id="app" aria-live="polite"><p class="msg">loading results...</p></main>
+<footer>Win = 3 or more of 6 matched, any order. Verify every result with PCSO. Edit sets.json to change your numbers. Entertainment only.</footer></div>
+<script>
+const NAME={ultra:'Ultra Lotto 6/58',super:'Superlotto 6/49'};let R,C,range='latest';
+const pad=n=>String(Number(n)).padStart(2,'0'),balls=(a,h=[])=>a.map(n=>`<span class="n${h.includes(n)?' hit':''}">${pad(n)}</span>`).join('');
+Promise.all(['results.json','sets.json'].map(f=>fetch(f+'?'+Date.now()).then(r=>{if(!r.ok)throw 0;return r.json()}))).then(([a,b])=>{R=a.draws;C=b;render()}).catch(()=>app.innerHTML='<p class="msg err">error: could not load results.json / sets.json</p>');
+document.querySelectorAll('button').forEach(b=>b.onclick=()=>{range=b.dataset.r;render()});
+function render(){
+document.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.r===range));
+if(!R.length){app.innerHTML='<p class="msg">no draws recorded yet</p>';return}
+const latest=R.map(d=>d.date).sort().pop(),cut=new Date(latest+'T12:00:00Z');cut.setUTCDate(cut.getUTCDate()-6);const cs=cut.toISOString().slice(0,10);
+const sel=R.filter(d=>range==='latest'?d.date===latest:range==='week'?d.date>=cs:1).sort((a,b)=>b.date.localeCompare(a.date)||a.game.localeCompare(b.game));
+let cost=0,prize=0,win=0,unk=0,h='';
+for(const d of sel){h+=`<article class="draw"><header><h2>${NAME[d.game]}</h2><time>${d.date}</time></header><p class="nums">${balls(d.numbers)}</p><ul>`;
+for(const s of C.sets[d.game]){const hit=s.filter(n=>d.numbers.includes(n)),k=hit.length;cost+=C.costPerPlay;const p=k===3?C.prize3[d.game]:0;if(k>=3){win++;p?prize+=p:unk++}
+h+=`<li><span>${balls(s,hit)}</span><span class="r">${k}/6 <b class="${k>=3?'W':'L'}">${k>=3?'WIN'+(p?' PHP '+p:' check PCSO'):'LOSE'}</b></span></li>`}h+='</ul></article>'}
+app.innerHTML=`<h1 class="${win?'W':'L'}">${win?'WIN':'LOSE'}</h1><dl class="m"><div><dt>spent</dt><dd>PHP ${cost}</dd></div><div><dt>prizes${unk?' (+higher)':''}</dt><dd>PHP ${prize}</dd></div><div><dt>net</dt><dd>PHP ${prize-cost}</dd></div></dl>`+h}
+</script></body></html>

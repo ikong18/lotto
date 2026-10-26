@@ -1,0 +1,10 @@
+/* Hallmark tokens · theme: Terminal (dark / mono / phosphor-green) · paper dark, display mono, accent chromatic-other */
+:root{color-scheme:dark;
+--color-paper:oklch(16% 0.012 150);--color-paper-2:oklch(21% 0.015 150);--color-rule:oklch(34% 0.02 150);
+--color-ink:oklch(93% 0.02 140);--color-mute:oklch(72% 0.02 150);--color-accent:oklch(84% 0.19 145);
+--color-accent-ink:oklch(18% 0.03 150);--color-lose:oklch(74% 0.15 25);--color-focus:oklch(88% 0.15 95);
+--font-display:"JetBrains Mono",ui-monospace,Menlo,monospace;--font-body:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+--space-xs:4px;--space-sm:8px;--space-md:16px;--space-lg:24px;--space-xl:40px;
+--text-sm:.8125rem;--text-md:.9375rem;--text-lg:1.125rem;--text-display:clamp(2.5rem,12vw,4.5rem);
+--ease-out:cubic-bezier(.2,.7,.2,1);--ease-in:cubic-bezier(.5,0,.9,.4);--ease-in-out:cubic-bezier(.6,0,.2,1);
+--dur-fast:120ms;--dur-base:200ms;--rule-w:1px;--radius-sm:2px}
