@@ -33,23 +33,51 @@ footer{border-top:var(--rule-w) solid var(--color-rule);padding:var(--space-lg) 
 @keyframes in{from{opacity:0}to{opacity:1}}
 @media(max-width:420px){.m{grid-template-columns:minmax(0,1fr)}li{grid-template-columns:minmax(0,1fr)}li .r{text-align:left}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.m{grid-template-columns:repeat(auto-fit,minmax(9rem,1fr))}
+svg{width:100%;height:auto;display:block}svg text{fill:var(--color-mute);font:11px var(--font-body)}.ln{fill:none;stroke:var(--color-accent);stroke-width:2}.zero{stroke:var(--color-rule);stroke-dasharray:4 4}
+h3{font:700 var(--text-md) var(--font-display);margin:var(--space-xl) 0 var(--space-sm)}
+.cap{color:var(--color-mute);font-size:var(--text-sm);margin:0 0 var(--space-sm)}
+.br{display:grid;grid-template-columns:6rem minmax(0,1fr) 3rem;gap:var(--space-sm);align-items:center;font-size:var(--text-sm);padding:2px 0}.br i{display:block;height:10px;background:var(--color-accent);width:var(--w);min-width:2px}.br b{text-align:right}
+.heat{display:grid;grid-template-columns:repeat(auto-fill,minmax(2.6rem,1fr));gap:var(--space-xs);margin:var(--space-sm) 0 var(--space-md)}
+.h{padding:6px 0;text-align:center;font-size:var(--text-sm);border:var(--rule-w) solid var(--color-rule);background:color-mix(in oklch,var(--color-accent) var(--p),var(--color-paper-2))}.h.hi{color:var(--color-accent-ink)}.h.me{outline:2px solid var(--color-ink);outline-offset:-3px}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:var(--space-md);margin:var(--space-lg) 0;font-size:var(--text-sm)}
+.sp li{grid-template-columns:minmax(0,1fr)}.sp small{color:var(--color-mute)}
+.bar+.bar{border-bottom:0;padding-top:var(--space-sm)}.bar{margin-bottom:0}
 </style></head><body><div class="wrap">
-<header class="bar"><span class="prompt">lotto@tracker:~$ show</span><nav aria-label="Range"><button data-r="latest">--latest</button><button data-r="week">--week</button><button data-r="all">--all</button></nav></header>
+<header class="bar"><span class="prompt">lotto@tracker:~$</span><nav aria-label="View"><button data-v="overview">--overview</button><button data-v="history">--history</button><button data-v="numbers">--numbers</button></nav></header>
+<header class="bar"><span class="prompt">game</span><nav aria-label="Game"><button data-g="all">all</button><button data-g="ultra">ultra</button><button data-g="super">super</button></nav></header>
 <main id="app" aria-live="polite"><p class="msg">loading results...</p></main>
-<footer>Win = 3 or more of 6 matched, any order. Verify every result with PCSO. Edit sets.json to change your numbers. Entertainment only.</footer></div>
+<footer>Win = 3+ of 6 matched. Charts apply your current sets to every recorded draw (a backtest, not your real bets); prizes for 4 and 5 matches are estimates from the Oct 25 payout table. Hot and cold numbers are descriptive only, every draw is independent. Verify results with PCSO. Entertainment only.</footer></div>
 <script>
-const NAME={ultra:'Ultra Lotto 6/58',super:'Superlotto 6/49'};let R,C,range='latest';
-const pad=n=>String(Number(n)).padStart(2,'0'),balls=(a,h=[])=>a.map(n=>`<span class="n${h.includes(n)?' hit':''}">${pad(n)}</span>`).join('');
-Promise.all(['results.json','sets.json'].map(f=>fetch(f+'?'+Date.now()).then(r=>{if(!r.ok)throw 0;return r.json()}))).then(([a,b])=>{R=a.draws;C=b;render()}).catch(()=>app.innerHTML='<p class="msg err">error: could not load results.json / sets.json</p>');
-document.querySelectorAll('button').forEach(b=>b.onclick=()=>{range=b.dataset.r;render()});
+const NAME={ultra:'Ultra Lotto 6/58',super:'Superlotto 6/49'},MAXN={ultra:58,super:49};
+let R,C,P,view='overview',game='all',pg=0;const PER=4,$=s=>document.querySelector(s);
+const pad=n=>String(Number(n)).padStart(2,'0'),money=n=>(n<0?'-':'')+'PHP '+Math.abs(Math.round(n)).toLocaleString('en-US');
+const balls=(a,h=[])=>a.map(n=>`<span class="n${h.includes(n)?' hit':''}">${pad(n)}</span>`).join('');
+Promise.all(['results.json','sets.json'].map(f=>fetch(f+'?'+Date.now()).then(r=>{if(!r.ok)throw 0;return r.json()}))).then(([a,b])=>{R=a.draws;C=b;P=new Set(b.personal||[]);render()}).catch(()=>$('#app').innerHTML='<p class="msg err">error: could not load results.json / sets.json</p>');
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;if(b.dataset.v){view=b.dataset.v;pg=0}if(b.dataset.g){game=b.dataset.g;pg=0}if(b.dataset.pg)pg+=+b.dataset.pg;render()});
+const ev=d=>C.sets[d.game].map(s=>{const hit=s.filter(n=>d.numbers.includes(n)),k=hit.length;return{s,hit,k,p:k>=3?(C.prizeEst[d.game][k]||0):0}});
+const chrono=()=>R.filter(d=>game==='all'||d.game===game).sort((a,b)=>a.date.localeCompare(b.date)||a.game.localeCompare(b.game));
+function stats(ds){const o={plays:0,won:0,hits:0,best:0,dist:[0,0,0,0,0,0,0],cum:[],per:{}};let net=0;
+for(const d of ds){let dn=0;ev(d).forEach((r,i)=>{o.plays++;o.dist[r.k]++;o.best=Math.max(o.best,r.k);if(r.k>=3){o.hits++;o.won+=r.p}const q=o.per[d.game+i]??={g:d.game,i,n:0,t:0,w:0,b:0,p:0};q.n++;q.t+=r.k;q.b=Math.max(q.b,r.k);if(r.k>=3){q.w++;q.p+=r.p}dn+=r.p-C.costPerPlay});net+=dn;o.cum.push(net)}
+o.spent=o.plays*C.costPerPlay;o.net=o.won-o.spent;return o}
+function line(v){if(v.length<2)return'<p class="msg">need 2+ draws for a chart</p>';const W=360,H=200,m=24,lo=Math.min(0,...v),hi=Math.max(0,...v),y=t=>H-m-(t-lo)/((hi-lo)||1)*(H-2*m),x=i=>m+i/(v.length-1)*(W-2*m);
+return`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Cumulative net over recorded draws"><line class="zero" x1="${m}" x2="${W-m}" y1="${y(0)}" y2="${y(0)}"/><polyline class="ln" points="${v.map((t,i)=>x(i).toFixed(1)+','+y(t).toFixed(1)).join(' ')}"/><text x="${m}" y="12">high ${money(hi)}</text><text x="${m}" y="${H-4}">low ${money(lo)}</text><text x="${W-m}" y="${H-4}" text-anchor="end">now ${money(v.at(-1))}</text></svg>`}
+function draw(d){return`<article class="draw"><header><h2>${NAME[d.game]}</h2><time>${d.date}</time></header><p class="nums">${balls(d.numbers)}</p><ul>${ev(d).map(r=>`<li><span>${balls(r.s,r.hit)}</span><span class="r">${r.k}/6 <b class="${r.k>=3?'W':'L'}">${r.k>=3?'WIN'+(r.p?' ~'+money(r.p):''):'LOSE'}</b></span></li>`).join('')}</ul></article>`}
+function heat(g){const ds=R.filter(d=>d.game===g).sort((a,b)=>a.date.localeCompare(b.date)),c={},last={};ds.forEach((d,i)=>d.numbers.forEach(n=>{c[n]=(c[n]||0)+1;last[n]=i}));const mx=Math.max(1,...Object.values(c)),all=[...Array(MAXN[g]).keys()].map(i=>i+1);
+const hot=all.filter(n=>c[n]).sort((a,b)=>c[b]-c[a]||a-b).slice(0,5),cold=all.slice().sort((a,b)=>(last[a]??-1)-(last[b]??-1)||a-b).slice(0,5);
+return`<h3>${NAME[g]} - ${ds.length} draws</h3><div class="heat">${all.map(n=>{const p=Math.round((c[n]||0)/mx*100);return`<span class="h${p>=50?' hi':''}${P.has(n)?' me':''}" style="--p:${p}%" title="${pad(n)}: ${c[n]||0}x">${pad(n)}</span>`}).join('')}</div><dl class="m"><div><dt>most drawn</dt><dd>${hot.map(n=>pad(n)+'x'+c[n]).join(' ')}</dd></div><div><dt>unseen longest (draws)</dt><dd>${cold.map(n=>pad(n)+' ('+(ds.length-1-(last[n]??-1))+')').join(' ')}</dd></div></dl>`}
 function render(){
-document.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.r===range));
-if(!R.length){app.innerHTML='<p class="msg">no draws recorded yet</p>';return}
-const latest=R.map(d=>d.date).sort().pop(),cut=new Date(latest+'T12:00:00Z');cut.setUTCDate(cut.getUTCDate()-6);const cs=cut.toISOString().slice(0,10);
-const sel=R.filter(d=>range==='latest'?d.date===latest:range==='week'?d.date>=cs:1).sort((a,b)=>b.date.localeCompare(a.date)||a.game.localeCompare(b.game));
-let cost=0,prize=0,win=0,unk=0,h='';
-for(const d of sel){h+=`<article class="draw"><header><h2>${NAME[d.game]}</h2><time>${d.date}</time></header><p class="nums">${balls(d.numbers)}</p><ul>`;
-for(const s of C.sets[d.game]){const hit=s.filter(n=>d.numbers.includes(n)),k=hit.length;cost+=C.costPerPlay;const p=k===3?C.prize3[d.game]:0;if(k>=3){win++;p?prize+=p:unk++}
-h+=`<li><span>${balls(s,hit)}</span><span class="r">${k}/6 <b class="${k>=3?'W':'L'}">${k>=3?'WIN'+(p?' PHP '+p:' check PCSO'):'LOSE'}</b></span></li>`}h+='</ul></article>'}
-app.innerHTML=`<h1 class="${win?'W':'L'}">${win?'WIN':'LOSE'}</h1><dl class="m"><div><dt>spent</dt><dd>PHP ${cost}</dd></div><div><dt>prizes${unk?' (+higher)':''}</dt><dd>PHP ${prize}</dd></div><div><dt>net</dt><dd>PHP ${prize-cost}</dd></div></dl>`+h}
+document.querySelectorAll('button[data-v]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===view));document.querySelectorAll('button[data-g]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.g===game));
+const ds=chrono(),app=$('#app');if(!ds.length){app.innerHTML='<p class="msg">no draws recorded yet</p>';return}
+let h='';
+if(view==='overview'){const s=stats(ds),ld=ds.at(-1).date,lw=ds.filter(d=>d.date===ld).reduce((a,d)=>a+ev(d).filter(r=>r.k>=3).length,0),mx=Math.max(1,...s.dist);
+h=`<h1 class="${lw?'W':'L'}">${lw?'WIN':'LOSE'}</h1><p class="cap">latest draw ${ld}: ${lw} winning set(s)</p>
+<dl class="m"><div><dt>draws tracked</dt><dd>${ds.length}</dd></div><div><dt>win rate (plays)</dt><dd>${(s.hits/s.plays*100).toFixed(1)}%</dd></div><div><dt>best match</dt><dd>${s.best}/6</dd></div><div><dt>spent</dt><dd>${money(s.spent)}</dd></div><div><dt>won (est.)</dt><dd>${money(s.won)}</dd></div><div><dt>net</dt><dd class="${s.net<0?'L':'W'}">${money(s.net)}</dd></div></dl>
+<h3>cumulative net</h3>${line(s.cum)}<h3>matches per play</h3>${s.dist.map((c,k)=>`<div class="br"><span>${k} match${k==1?'':'es'}</span><i style="--w:${c?Math.max(2,c/mx*100):0}%"></i><b>${c}</b></div>`).join('')}
+<h3>set performance</h3><ul class="sp">${Object.values(s.per).map(q=>`<li><span>${balls(C.sets[q.g][q.i])}<br><small>${q.g==='ultra'?'Ultra':'Super'} ${'ABCDE'[q.i]}: wins ${q.w}/${q.n} - best ${q.b} - avg ${(q.t/q.n).toFixed(2)} - est. ${money(q.p-q.n*C.costPerPlay)} net</small></span></li>`).join('')}</ul>`}
+else if(view==='history'){const hs=ds.slice().reverse(),pages=Math.ceil(hs.length/PER);pg=Math.max(0,Math.min(pg,pages-1));
+h=hs.slice(pg*PER,pg*PER+PER).map(draw).join('')+`<div class="pager"><button data-pg="-1" ${pg<=0?'disabled':''}>prev</button><span>page ${pg+1} / ${pages} (${hs.length} draws)</span><button data-pg="1" ${pg>=pages-1?'disabled':''}>next</button></div>`}
+else h=(game==='all'?['ultra','super']:[game]).map(heat).join('')+'<p class="cap">shade = how often drawn; outlined = your personal numbers.</p>';
+app.innerHTML=h}
 </script></body></html>
