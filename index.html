@@ -1,83 +1,97 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lotto Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
 <link rel="stylesheet" href="tokens.css"><style>
-/* Hallmark · macrostructure: Workbench · tone: technical · anchor hue: phosphor green 145
- * genre: atmospheric · theme: Terminal · nav: N8 Terminal · footer: Ft5 Statement · enrichment: none (typography only)
- * pre-emit critique: P4 H4 E4 S4 R4 V3 · slop test: not run (reference gates not loaded) */
+/* Hallmark · macrostructure: Workbench (pass 2) · tone: technical, modern · anchor hue: phosphor green 150 + amber accent
+ * genre: atmospheric · fonts: Bricolage Grotesque / Instrument Sans / JetBrains Mono · slop test: not run (reference gates not loaded) */
 *{box-sizing:border-box}html,body{overflow-x:clip}
-body{margin:0;background:var(--color-paper);color:var(--color-ink);font:400 var(--text-md)/1.55 var(--font-body)}
-.wrap{max-width:46rem;margin:auto;padding:var(--space-md)}
-.bar{display:flex;align-items:center;gap:var(--space-md);flex-wrap:wrap;padding-bottom:var(--space-md);border-bottom:var(--rule-w) solid var(--color-rule);font-size:var(--text-sm)}
-.prompt{color:var(--color-accent);font-family:var(--font-display)}
-nav{display:flex;gap:var(--space-sm)}
-button{font:500 var(--text-sm) var(--font-display);white-space:nowrap;color:var(--color-ink);background:none;border:var(--rule-w) solid var(--color-rule);border-radius:var(--radius-sm);padding:var(--space-sm) var(--space-md);cursor:pointer;transition:background var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out)}
-button:hover,button.is-hover{background:var(--color-paper-2)}button:active,button.is-active{transform:translateY(1px)}
-button:focus-visible,button.is-focus{outline:2px solid var(--color-focus);outline-offset:2px}
-button[aria-pressed=true]{background:var(--color-accent);color:var(--color-accent-ink);border-color:var(--color-accent)}
-button:disabled{opacity:.4;cursor:not-allowed}
-h1{font:700 var(--text-display)/1 var(--font-display);margin:var(--space-xl) 0 var(--space-md);overflow-wrap:anywhere;min-width:0;letter-spacing:-.02em}
-.W{color:var(--color-accent)}.L{color:var(--color-lose)}
-.m{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-md);margin:0 0 var(--space-xl);padding:var(--space-md) 0;border-block:var(--rule-w) solid var(--color-rule)}
-.m dt{color:var(--color-mute);font-size:var(--text-sm)}.m dd{margin:0;font:500 var(--text-lg) var(--font-display);overflow-wrap:anywhere}
-.draw{margin-bottom:var(--space-xl);animation:in var(--dur-base) var(--ease-out)}
-.draw>header{display:flex;justify-content:space-between;gap:var(--space-md);flex-wrap:wrap;align-items:baseline;border-bottom:var(--rule-w) solid var(--color-rule);padding-bottom:var(--space-sm)}
-h2{font:700 var(--text-lg) var(--font-display);margin:0}time{color:var(--color-mute);font-size:var(--text-sm)}
-.nums{margin:var(--space-md) 0}.n{display:inline-block;min-width:2.25rem;text-align:center;margin:0 var(--space-xs) var(--space-xs) 0;padding:var(--space-xs) var(--space-sm);border:var(--rule-w) solid var(--color-rule);border-radius:var(--radius-sm);font-family:var(--font-display)}
-.n.hit{background:var(--color-accent);border-color:var(--color-accent);color:var(--color-accent-ink);font-weight:700}
-.draw .nums .n{border-color:var(--color-ink)}
-ul{list-style:none;margin:0;padding:0}li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--space-sm);align-items:center;padding:var(--space-sm) 0;border-top:var(--rule-w) solid var(--color-rule)}
-li .r{text-align:right;font-size:var(--text-sm)}
-footer{border-top:var(--rule-w) solid var(--color-rule);padding:var(--space-lg) 0;color:var(--color-mute);font-size:var(--text-sm)}
+body{margin:0;min-height:100vh;color:var(--color-ink);font:400 var(--text-md)/1.55 var(--font-body);background:radial-gradient(60rem 30rem at 90% -10%,color-mix(in oklch,var(--color-accent) 15%,transparent),transparent 60%),radial-gradient(40rem 26rem at -10% 25%,color-mix(in oklch,var(--color-amber) 8%,transparent),transparent 60%),var(--color-paper);background-attachment:fixed}
+.top{position:sticky;top:0;z-index:5;background:color-mix(in oklch,var(--color-paper) 80%,transparent);backdrop-filter:blur(14px);border-bottom:var(--rule-w) solid var(--color-rule)}
+.top>div{max-width:64rem;margin:auto;padding:var(--space-sm) var(--space-md);display:flex;flex-wrap:wrap;gap:var(--space-sm) var(--space-md);align-items:center;justify-content:space-between}
+.brand{font:800 1.25rem var(--font-display);letter-spacing:-.03em}.brand b{color:var(--color-accent)}
+.seg{position:relative;display:flex;padding:3px;border:var(--rule-w) solid var(--color-rule);border-radius:999px;background:var(--color-paper-2)}
+.seg button{position:relative;z-index:1;border:0;border-radius:999px;padding:7px 14px;font:500 var(--text-sm) var(--font-body);white-space:nowrap;background:none;color:var(--color-mute);cursor:pointer;transition:color var(--dur-base) var(--ease-out)}
+.seg button:hover{color:var(--color-ink)}.seg button[aria-pressed=true]{color:var(--color-accent-ink)}
+.pill{position:absolute;top:3px;bottom:3px;left:0;width:0;border-radius:999px;background:var(--color-accent);box-shadow:0 0 20px color-mix(in oklch,var(--color-accent) 45%,transparent);transition:transform var(--dur-slow) var(--ease-spring),width var(--dur-slow) var(--ease-spring)}
+button:focus-visible{outline:2px solid var(--color-focus);outline-offset:2px}
+.wrap{max-width:64rem;margin:auto;padding:var(--space-lg) var(--space-md) var(--space-xl)}
+.hero{position:relative;overflow:hidden;padding:var(--space-xl) var(--space-lg);border:var(--rule-w) solid var(--color-rule);border-radius:var(--radius-lg);background:linear-gradient(150deg,var(--color-card),var(--color-paper-2))}
+.hero::after{content:"";position:absolute;right:-8rem;bottom:-12rem;width:26rem;height:26rem;background:radial-gradient(closest-side,color-mix(in oklch,var(--glow,var(--color-accent)) 30%,transparent),transparent);animation:drift 7s var(--ease-in-out) infinite alternate;pointer-events:none}
+.hero.lose{--glow:var(--color-lose)}
+h1{font:800 var(--text-display)/.85 var(--font-display);letter-spacing:-.05em;margin:var(--space-sm) 0}
+h2{font:800 var(--text-lg) var(--font-display);letter-spacing:-.02em;margin:0}
+h3{font:800 var(--text-md) var(--font-display);margin:0 0 var(--space-md);color:var(--color-mute);letter-spacing:.02em}
+.W{color:var(--color-accent)}.L{color:var(--color-lose)}.cap{color:var(--color-mute);font-size:var(--text-sm);margin:0}
+.lat{display:grid;gap:var(--space-sm);margin-top:var(--space-lg);position:relative;z-index:1}
+.kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr));gap:var(--space-md);margin:var(--space-md) 0}
+.card{background:var(--color-card);border:var(--rule-w) solid var(--color-rule);border-radius:var(--radius-lg);padding:var(--space-md);transition:transform var(--dur-base) var(--ease-out),border-color var(--dur-base)}
+.card:hover{transform:translateY(-3px);border-color:color-mix(in oklch,var(--color-accent) 50%,var(--color-rule))}
+.k dt{color:var(--color-mute);font-size:var(--text-sm)}.k dd{margin:var(--space-xs) 0 0;font:800 1.6rem var(--font-display);letter-spacing:-.03em;overflow-wrap:anywhere}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:var(--space-md);margin-bottom:var(--space-md)}
+.n{display:inline-grid;place-items:center;width:2.4rem;height:2.4rem;margin:0 var(--space-xs) var(--space-xs) 0;border-radius:50%;font:700 .85rem var(--font-mono);background:radial-gradient(circle at 35% 28%,color-mix(in oklch,var(--color-ink) 22%,var(--color-card)),var(--color-paper-2));border:var(--rule-w) solid var(--color-rule);animation:pop var(--dur-slow) var(--ease-spring) both;animation-delay:calc(var(--j,0)*45ms + var(--i,0)*60ms)}
+.n.me{border:2px solid var(--color-amber)}.n.hit{background:radial-gradient(circle at 35% 28%,oklch(95% .12 150),var(--color-accent));color:var(--color-accent-ink);box-shadow:0 0 16px color-mix(in oklch,var(--color-accent) 55%,transparent)}
+.lat .n{width:2.7rem;height:2.7rem}
+svg{width:100%;height:auto;display:block}svg text{fill:var(--color-mute);font:11px var(--font-body)}
+.ln{fill:none;stroke:var(--color-accent);stroke-width:2.5;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.4s var(--ease-out) .25s forwards}
+.ar{animation:fade 1s var(--ease-out) .9s both}.zero{stroke:var(--color-rule);stroke-dasharray:4 4}.dot{fill:var(--color-accent);animation:pulse 2s var(--ease-in-out) 1.4s infinite}
+.br{display:grid;grid-template-columns:5.5rem minmax(0,1fr) 2.5rem;gap:var(--space-sm);align-items:center;font-size:var(--text-sm);padding:3px 0}
+.br i{display:block;height:10px;border-radius:99px;background:var(--color-accent);width:var(--w);min-width:3px;transform-origin:left;animation:grow var(--dur-slow) var(--ease-out) .3s both}.br b{text-align:right;font-family:var(--font-mono)}
+.sp{display:flex;flex-direction:column;gap:var(--space-sm)}.sp small{color:var(--color-mute)}.meter{height:4px;border-radius:9px;background:var(--color-paper-2);margin-top:var(--space-sm)}.meter i{display:block;height:100%;border-radius:9px;background:var(--color-amber);width:var(--w);transform-origin:left;animation:grow var(--dur-slow) var(--ease-out) .4s both}
+.dh{display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-md);flex-wrap:wrap;margin-bottom:var(--space-md)}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--space-sm);align-items:center;padding:var(--space-sm) 0;border-top:var(--rule-w) solid var(--color-rule);font-size:var(--text-sm)}.row .r{text-align:right}
+.draw{margin-bottom:var(--space-md)}
+.heat{display:grid;grid-template-columns:repeat(auto-fill,minmax(2.7rem,1fr));gap:var(--space-xs);margin-bottom:var(--space-md)}
+.h{padding:7px 0;text-align:center;font:500 var(--text-sm) var(--font-mono);border-radius:var(--radius-sm);background:color-mix(in oklch,var(--color-accent) var(--p),var(--color-paper-2));animation:pop .4s var(--ease-out) both;animation-delay:calc(var(--j)*9ms);transition:transform var(--dur-fast)}
+.h:hover{transform:scale(1.18);position:relative;z-index:1}.h.hi{color:var(--color-accent-ink)}.h.me{outline:2px solid var(--color-amber);outline-offset:-2px}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:var(--space-md);font-size:var(--text-sm);margin-top:var(--space-lg)}
+.btn{border:var(--rule-w) solid var(--color-rule);background:var(--color-card);color:var(--color-ink);border-radius:999px;padding:9px 20px;font:500 var(--text-sm) var(--font-body);cursor:pointer;transition:background var(--dur-fast),transform var(--dur-fast)}
+.btn:hover{background:var(--color-paper-2)}.btn:active{transform:scale(.96)}.btn:disabled{opacity:.35;cursor:not-allowed}
 .msg{color:var(--color-mute)}.msg.err{color:var(--color-lose)}
-@keyframes in{from{opacity:0}to{opacity:1}}
-@media(max-width:420px){.m{grid-template-columns:minmax(0,1fr)}li{grid-template-columns:minmax(0,1fr)}li .r{text-align:left}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-
-.m{grid-template-columns:repeat(auto-fit,minmax(9rem,1fr))}
-svg{width:100%;height:auto;display:block}svg text{fill:var(--color-mute);font:11px var(--font-body)}.ln{fill:none;stroke:var(--color-accent);stroke-width:2}.zero{stroke:var(--color-rule);stroke-dasharray:4 4}
-h3{font:700 var(--text-md) var(--font-display);margin:var(--space-xl) 0 var(--space-sm)}
-.cap{color:var(--color-mute);font-size:var(--text-sm);margin:0 0 var(--space-sm)}
-.br{display:grid;grid-template-columns:6rem minmax(0,1fr) 3rem;gap:var(--space-sm);align-items:center;font-size:var(--text-sm);padding:2px 0}.br i{display:block;height:10px;background:var(--color-accent);width:var(--w);min-width:2px}.br b{text-align:right}
-.heat{display:grid;grid-template-columns:repeat(auto-fill,minmax(2.6rem,1fr));gap:var(--space-xs);margin:var(--space-sm) 0 var(--space-md)}
-.h{padding:6px 0;text-align:center;font-size:var(--text-sm);border:var(--rule-w) solid var(--color-rule);background:color-mix(in oklch,var(--color-accent) var(--p),var(--color-paper-2))}.h.hi{color:var(--color-accent-ink)}.h.me{outline:2px solid var(--color-ink);outline-offset:-3px}
-.pager{display:flex;justify-content:space-between;align-items:center;gap:var(--space-md);margin:var(--space-lg) 0;font-size:var(--text-sm)}
-.sp li{grid-template-columns:minmax(0,1fr)}.sp small{color:var(--color-mute)}
-.bar+.bar{border-bottom:0;padding-top:var(--space-sm)}.bar{margin-bottom:0}
-</style></head><body><div class="wrap">
-<header class="bar"><span class="prompt">lotto@tracker:~$</span><nav aria-label="View"><button data-v="overview">--overview</button><button data-v="history">--history</button><button data-v="numbers">--numbers</button></nav></header>
-<header class="bar"><span class="prompt">game</span><nav aria-label="Game"><button data-g="all">all</button><button data-g="ultra">ultra</button><button data-g="super">super</button></nav></header>
-<main id="app" aria-live="polite"><p class="msg">loading results...</p></main>
-<footer>Win = 3+ of 6 matched. Charts apply your current sets to every recorded draw (a backtest, not your real bets); prizes for 4 and 5 matches are estimates from the Oct 25 payout table. Hot and cold numbers are descriptive only, every draw is independent. Verify results with PCSO. Entertainment only.</footer></div>
+footer{max-width:64rem;margin:auto;padding:var(--space-lg) var(--space-md) var(--space-xl);color:var(--color-mute);font-size:var(--text-sm);border-top:var(--rule-w) solid var(--color-rule)}
+.rise{animation:rise var(--dur-slow) var(--ease-out) both;animation-delay:calc(var(--i,0)*60ms)}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}}@keyframes pop{from{opacity:0;transform:scale(.4)}}@keyframes fade{from{opacity:0}}
+@keyframes draw{to{stroke-dashoffset:0}}@keyframes grow{from{transform:scaleX(0)}}@keyframes pulse{50%{opacity:.35}}@keyframes drift{to{transform:translate(-3rem,-2rem)}}
+@media(max-width:420px){.row{grid-template-columns:minmax(0,1fr)}.row .r{text-align:left}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.ln{stroke-dashoffset:0}}
+</style></head><body>
+<header class="top"><div><span class="brand">lotto<b>.</b>tracker</span>
+<div class="seg" aria-label="View"><i class="pill"></i><button data-v="overview">Overview</button><button data-v="history">History</button><button data-v="numbers">Numbers</button></div>
+<div class="seg" aria-label="Game"><i class="pill"></i><button data-g="all">All</button><button data-g="ultra">Ultra</button><button data-g="super">Super</button></div></div></header>
+<main class="wrap" id="app" aria-live="polite"><p class="msg">loading results...</p></main>
+<footer>Win = 3+ of 6 matched. Charts apply your current sets to every recorded draw (a backtest, not your real bets); prizes for 4 and 5 matches are estimates from the Oct 25 payout table. Hot and cold numbers are descriptive only, every draw is independent. Amber ring = your personal numbers. Verify results with PCSO. Entertainment only.</footer>
 <script>
 const NAME={ultra:'Ultra Lotto 6/58',super:'Superlotto 6/49'},MAXN={ultra:58,super:49};
 let R,C,P,view='overview',game='all',pg=0;const PER=4,$=s=>document.querySelector(s);
 const pad=n=>String(Number(n)).padStart(2,'0'),money=n=>(n<0?'-':'')+'PHP '+Math.abs(Math.round(n)).toLocaleString('en-US');
-const balls=(a,h=[])=>a.map(n=>`<span class="n${h.includes(n)?' hit':''}">${pad(n)}</span>`).join('');
+const fm=(f,v)=>f==='m'?money(v):f==='p'?v.toFixed(1)+'%':f==='b'?Math.round(v)+'/6':Math.round(v);
+const balls=(a,h=[],mark)=>a.map((n,j)=>`<span class="n${h.includes(n)?' hit':''}${mark&&P.has(n)?' me':''}" style="--j:${j}">${pad(n)}</span>`).join('');
 Promise.all(['results.json','sets.json'].map(f=>fetch(f+'?'+Date.now()).then(r=>{if(!r.ok)throw 0;return r.json()}))).then(([a,b])=>{R=a.draws;C=b;P=new Set(b.personal||[]);render()}).catch(()=>$('#app').innerHTML='<p class="msg err">error: could not load results.json / sets.json</p>');
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;if(b.dataset.v){view=b.dataset.v;pg=0}if(b.dataset.g){game=b.dataset.g;pg=0}if(b.dataset.pg)pg+=+b.dataset.pg;render()});
+addEventListener('resize',()=>pills());document.fonts&&document.fonts.ready.then(()=>pills());
 const ev=d=>C.sets[d.game].map(s=>{const hit=s.filter(n=>d.numbers.includes(n)),k=hit.length;return{s,hit,k,p:k>=3?(C.prizeEst[d.game][k]||0):0}});
 const chrono=()=>R.filter(d=>game==='all'||d.game===game).sort((a,b)=>a.date.localeCompare(b.date)||a.game.localeCompare(b.game));
 function stats(ds){const o={plays:0,won:0,hits:0,best:0,dist:[0,0,0,0,0,0,0],cum:[],per:{}};let net=0;
 for(const d of ds){let dn=0;ev(d).forEach((r,i)=>{o.plays++;o.dist[r.k]++;o.best=Math.max(o.best,r.k);if(r.k>=3){o.hits++;o.won+=r.p}const q=o.per[d.game+i]??={g:d.game,i,n:0,t:0,w:0,b:0,p:0};q.n++;q.t+=r.k;q.b=Math.max(q.b,r.k);if(r.k>=3){q.w++;q.p+=r.p}dn+=r.p-C.costPerPlay});net+=dn;o.cum.push(net)}
 o.spent=o.plays*C.costPerPlay;o.net=o.won-o.spent;return o}
-function line(v){if(v.length<2)return'<p class="msg">need 2+ draws for a chart</p>';const W=360,H=200,m=24,lo=Math.min(0,...v),hi=Math.max(0,...v),y=t=>H-m-(t-lo)/((hi-lo)||1)*(H-2*m),x=i=>m+i/(v.length-1)*(W-2*m);
-return`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Cumulative net over recorded draws"><line class="zero" x1="${m}" x2="${W-m}" y1="${y(0)}" y2="${y(0)}"/><polyline class="ln" points="${v.map((t,i)=>x(i).toFixed(1)+','+y(t).toFixed(1)).join(' ')}"/><text x="${m}" y="12">high ${money(hi)}</text><text x="${m}" y="${H-4}">low ${money(lo)}</text><text x="${W-m}" y="${H-4}" text-anchor="end">now ${money(v.at(-1))}</text></svg>`}
-function draw(d){return`<article class="draw"><header><h2>${NAME[d.game]}</h2><time>${d.date}</time></header><p class="nums">${balls(d.numbers)}</p><ul>${ev(d).map(r=>`<li><span>${balls(r.s,r.hit)}</span><span class="r">${r.k}/6 <b class="${r.k>=3?'W':'L'}">${r.k>=3?'WIN'+(r.p?' ~'+money(r.p):''):'LOSE'}</b></span></li>`).join('')}</ul></article>`}
-function heat(g){const ds=R.filter(d=>d.game===g).sort((a,b)=>a.date.localeCompare(b.date)),c={},last={};ds.forEach((d,i)=>d.numbers.forEach(n=>{c[n]=(c[n]||0)+1;last[n]=i}));const mx=Math.max(1,...Object.values(c)),all=[...Array(MAXN[g]).keys()].map(i=>i+1);
+function line(v){if(v.length<2)return'<p class="msg">need 2+ draws for a chart</p>';const W=360,H=200,m=24,lo=Math.min(0,...v),hi=Math.max(0,...v),y=t=>H-m-(t-lo)/((hi-lo)||1)*(H-2*m),x=i=>m+i/(v.length-1)*(W-2*m),pts=v.map((t,i)=>x(i).toFixed(1)+','+y(t).toFixed(1)).join(' ');
+return`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Cumulative net over recorded draws"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--color-accent);stop-opacity:.35"/><stop offset="1" style="stop-color:var(--color-accent);stop-opacity:0"/></linearGradient></defs><line class="zero" x1="${m}" x2="${W-m}" y1="${y(0)}" y2="${y(0)}"/><polygon class="ar" fill="url(#g)" points="${m},${y(0)} ${pts} ${W-m},${y(0)}"/><polyline class="ln" pathLength="1" points="${pts}"/><circle class="dot" cx="${x(v.length-1)}" cy="${y(v.at(-1))}" r="4"/><text x="${m}" y="12">high ${money(hi)}</text><text x="${m}" y="${H-4}">low ${money(lo)}</text><text x="${W-m}" y="${H-4}" text-anchor="end">now ${money(v.at(-1))}</text></svg>`}
+function draw(d,i){return`<article class="card draw rise" style="--i:${i}"><div class="dh"><h2>${NAME[d.game]}</h2><span class="cap">${d.date}</span></div><div>${balls(d.numbers)}</div>${ev(d).map(r=>`<div class="row"><span>${balls(r.s,r.hit,1)}</span><span class="r">${r.k}/6 <b class="${r.k>=3?'W':'L'}">${r.k>=3?'WIN'+(r.p?' ~'+money(r.p):''):'LOSE'}</b></span></div>`).join('')}</article>`}
+function heat(g,gi){const ds=R.filter(d=>d.game===g).sort((a,b)=>a.date.localeCompare(b.date)),c={},last={};ds.forEach((d,i)=>d.numbers.forEach(n=>{c[n]=(c[n]||0)+1;last[n]=i}));const mx=Math.max(1,...Object.values(c)),all=[...Array(MAXN[g]).keys()].map(i=>i+1);
 const hot=all.filter(n=>c[n]).sort((a,b)=>c[b]-c[a]||a-b).slice(0,5),cold=all.slice().sort((a,b)=>(last[a]??-1)-(last[b]??-1)||a-b).slice(0,5);
-return`<h3>${NAME[g]} - ${ds.length} draws</h3><div class="heat">${all.map(n=>{const p=Math.round((c[n]||0)/mx*100);return`<span class="h${p>=50?' hi':''}${P.has(n)?' me':''}" style="--p:${p}%" title="${pad(n)}: ${c[n]||0}x">${pad(n)}</span>`}).join('')}</div><dl class="m"><div><dt>most drawn</dt><dd>${hot.map(n=>pad(n)+'x'+c[n]).join(' ')}</dd></div><div><dt>unseen longest (draws)</dt><dd>${cold.map(n=>pad(n)+' ('+(ds.length-1-(last[n]??-1))+')').join(' ')}</dd></div></dl>`}
+return`<section class="card rise" style="--i:${gi};margin-bottom:var(--space-md)"><h3>${NAME[g]} - ${ds.length} draws</h3><div class="heat">${all.map(n=>{const p=Math.round((c[n]||0)/mx*100);return`<span class="h${p>=50?' hi':''}${P.has(n)?' me':''}" style="--p:${p}%;--j:${n}" title="${pad(n)}: ${c[n]||0}x">${pad(n)}</span>`}).join('')}</div><dl class="kp" style="margin:0"><div><dt class="cap">most drawn</dt><dd>${hot.map(n=>pad(n)+'x'+c[n]).join(' ')}</dd></div><div><dt class="cap">unseen longest (draws)</dt><dd>${cold.map(n=>pad(n)+' ('+(ds.length-1-(last[n]??-1))+')').join(' ')}</dd></div></dl></section>`}
+function pills(){document.querySelectorAll('.seg').forEach(s=>{const b=s.querySelector('[aria-pressed=true]'),p=s.querySelector('.pill');if(b&&p){p.style.width=b.offsetWidth+'px';p.style.transform='translateX('+b.offsetLeft+'px)'}})}
+function countUp(){const rm=matchMedia('(prefers-reduced-motion: reduce)').matches;document.querySelectorAll('[data-n]').forEach(el=>{const to=+el.dataset.n,f=el.dataset.f,t0=performance.now(),D=rm?0:900;(function step(t){const k=D?1:Math.min(1,(t-t0)/D);el.textContent=fm(f,to*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(step)})(t0)})}
 function render(){
 document.querySelectorAll('button[data-v]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===view));document.querySelectorAll('button[data-g]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.g===game));
-const ds=chrono(),app=$('#app');if(!ds.length){app.innerHTML='<p class="msg">no draws recorded yet</p>';return}
+const ds=chrono(),app=$('#app');if(!ds.length){app.innerHTML='<p class="msg">no draws recorded yet</p>';pills();return}
 let h='';
-if(view==='overview'){const s=stats(ds),ld=ds.at(-1).date,lw=ds.filter(d=>d.date===ld).reduce((a,d)=>a+ev(d).filter(r=>r.k>=3).length,0),mx=Math.max(1,...s.dist);
-h=`<h1 class="${lw?'W':'L'}">${lw?'WIN':'LOSE'}</h1><p class="cap">latest draw ${ld}: ${lw} winning set(s)</p>
-<dl class="m"><div><dt>draws tracked</dt><dd>${ds.length}</dd></div><div><dt>win rate (plays)</dt><dd>${(s.hits/s.plays*100).toFixed(1)}%</dd></div><div><dt>best match</dt><dd>${s.best}/6</dd></div><div><dt>spent</dt><dd>${money(s.spent)}</dd></div><div><dt>won (est.)</dt><dd>${money(s.won)}</dd></div><div><dt>net</dt><dd class="${s.net<0?'L':'W'}">${money(s.net)}</dd></div></dl>
-<h3>cumulative net</h3>${line(s.cum)}<h3>matches per play</h3>${s.dist.map((c,k)=>`<div class="br"><span>${k} match${k==1?'':'es'}</span><i style="--w:${c?Math.max(2,c/mx*100):0}%"></i><b>${c}</b></div>`).join('')}
-<h3>set performance</h3><ul class="sp">${Object.values(s.per).map(q=>`<li><span>${balls(C.sets[q.g][q.i])}<br><small>${q.g==='ultra'?'Ultra':'Super'} ${'ABCDE'[q.i]}: wins ${q.w}/${q.n} - best ${q.b} - avg ${(q.t/q.n).toFixed(2)} - est. ${money(q.p-q.n*C.costPerPlay)} net</small></span></li>`).join('')}</ul>`}
+if(view==='overview'){const s=stats(ds),ld=ds.at(-1).date,ls=ds.filter(d=>d.date===ld),lw=ls.reduce((a,d)=>a+ev(d).filter(r=>r.k>=3).length,0),tot=ls.length*C.sets.ultra.length,mx=Math.max(1,...s.dist);
+h=`<section class="hero rise${lw?'':' lose'}"><p class="cap">Latest draw ${ld}</p><h1 class="${lw?'W':'L'}">${lw?'WIN':'LOSE'}</h1><p class="cap">${lw} of ${tot} sets scored 3+ matches</p><div class="lat">${ls.map((d,i)=>`<div><p class="cap">${NAME[d.game]}</p>${balls(d.numbers,[],0)}</div>`).join('')}</div></section>
+<dl class="kp">${[['Draws tracked',ds.length,'i'],['Win rate (plays)',s.hits/s.plays*100,'p'],['Best match',s.best,'b'],['Spent',s.spent,'m'],['Won (est.)',s.won,'m'],['Net',s.net,'m']].map(([l,v,f],i)=>`<div class="card k rise" style="--i:${i+1}"><dt>${l}</dt><dd class="${l==='Net'?(v<0?'L':'W'):''}" data-n="${v}" data-f="${f}">${fm(f,v)}</dd></div>`).join('')}</dl>
+<div class="g2"><section class="card rise" style="--i:7"><h3>Cumulative net</h3>${line(s.cum)}</section><section class="card rise" style="--i:8"><h3>Matches per play</h3>${s.dist.map((c,k)=>`<div class="br"><span>${k} match${k==1?'':'es'}</span><i style="--w:${c?Math.max(2,c/mx*100):0}%"></i><b>${c}</b></div>`).join('')}</section></div>
+<h3 class="rise" style="--i:9">Set performance</h3><div class="g2">${Object.values(s.per).map((q,i)=>`<div class="card sp rise" style="--i:${10+i}"><div>${balls(C.sets[q.g][q.i],[],1)}</div><small>${q.g==='ultra'?'Ultra':'Super'} ${'ABCDE'[q.i]} - wins ${q.w}/${q.n} - best ${q.b} - est. net ${money(q.p-q.n*C.costPerPlay)}</small><div class="meter"><i style="--w:${q.t/q.n/6*100}%"></i></div></div>`).join('')}</div>`}
 else if(view==='history'){const hs=ds.slice().reverse(),pages=Math.ceil(hs.length/PER);pg=Math.max(0,Math.min(pg,pages-1));
-h=hs.slice(pg*PER,pg*PER+PER).map(draw).join('')+`<div class="pager"><button data-pg="-1" ${pg<=0?'disabled':''}>prev</button><span>page ${pg+1} / ${pages} (${hs.length} draws)</span><button data-pg="1" ${pg>=pages-1?'disabled':''}>next</button></div>`}
-else h=(game==='all'?['ultra','super']:[game]).map(heat).join('')+'<p class="cap">shade = how often drawn; outlined = your personal numbers.</p>';
-app.innerHTML=h}
+h=hs.slice(pg*PER,pg*PER+PER).map(draw).join('')+`<div class="pager"><button class="btn" data-pg="-1" ${pg<=0?'disabled':''}>Prev</button><span>Page ${pg+1} of ${pages} &middot; ${hs.length} draws</span><button class="btn" data-pg="1" ${pg>=pages-1?'disabled':''}>Next</button></div>`}
+else h=(game==='all'?['ultra','super']:[game]).map(heat).join('')+'<p class="cap">Shade = how often drawn. Amber outline = your personal numbers.</p>';
+app.innerHTML=h;pills();countUp()}
 </script></body></html>
