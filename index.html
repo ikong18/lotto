@@ -9,7 +9,7 @@ body{margin:0;min-height:100vh;color:var(--color-ink);font:400 var(--text-md)/1.
 .top{position:sticky;top:0;z-index:5;background:color-mix(in oklch,var(--color-paper) 80%,transparent);backdrop-filter:blur(14px);border-bottom:var(--rule-w) solid var(--color-rule)}
 .top>div{max-width:64rem;margin:auto;padding:var(--space-sm) var(--space-md);display:flex;flex-wrap:wrap;gap:var(--space-sm) var(--space-md);align-items:center;justify-content:space-between}
 .brand{font:800 1.25rem var(--font-display);letter-spacing:-.03em}.brand b{color:var(--color-accent)}
-.seg{position:relative;display:flex;padding:3px;border:var(--rule-w) solid var(--color-rule);border-radius:999px;background:var(--color-paper-2)}
+.seg{overflow-x:auto;max-width:100%;scrollbar-width:none;position:relative;display:flex;padding:3px;border:var(--rule-w) solid var(--color-rule);border-radius:999px;background:var(--color-paper-2)}
 .seg button{position:relative;z-index:1;border:0;border-radius:999px;padding:7px 14px;font:500 var(--text-sm) var(--font-body);white-space:nowrap;background:none;color:var(--color-mute);cursor:pointer;transition:color var(--dur-base) var(--ease-out)}
 .seg button:hover{color:var(--color-ink)}.seg button[aria-pressed=true]{color:var(--color-accent-ink)}
 .pill{position:absolute;top:3px;bottom:3px;left:0;width:0;border-radius:999px;background:var(--color-accent);box-shadow:0 0 20px color-mix(in oklch,var(--color-accent) 45%,transparent);transition:transform var(--dur-slow) var(--ease-spring),width var(--dur-slow) var(--ease-spring)}
@@ -49,25 +49,30 @@ svg{width:100%;height:auto;display:block}svg text{fill:var(--color-mute);font:11
 .msg{color:var(--color-mute)}.msg.err{color:var(--color-lose)}
 footer{max-width:64rem;margin:auto;padding:var(--space-lg) var(--space-md) var(--space-xl);color:var(--color-mute);font-size:var(--text-sm);border-top:var(--rule-w) solid var(--color-rule)}
 .rise{animation:rise var(--dur-slow) var(--ease-out) both;animation-delay:calc(var(--i,0)*60ms)}
+a.btn{text-decoration:none;display:inline-block}.fr{display:flex;align-items:center;gap:var(--space-xs);flex-wrap:wrap;padding:6px 0;border-top:var(--rule-w) solid var(--color-rule)}.fr>.cap{width:1.5rem}
+.in,.tx{font:700 .85rem var(--font-mono);color:var(--color-ink);background:var(--color-paper-2);border:var(--rule-w) solid var(--color-rule);text-align:center}.in{width:2.4rem;height:2.4rem;border-radius:50%;padding:0}.tx{width:7rem;border-radius:var(--radius-sm);padding:8px}.tx.w{width:100%;text-align:left}
+.in:focus-visible,.tx:focus-visible{outline:2px solid var(--color-focus);border-color:var(--color-focus)}.ck{display:flex;gap:var(--space-sm);align-items:center;padding:6px 0}.ck input{accent-color:var(--color-accent);width:1.1rem;height:1.1rem}
+.acts{display:flex;gap:var(--space-sm);flex-wrap:wrap;margin-top:var(--space-sm)}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}}@keyframes pop{from{opacity:0;transform:scale(.4)}}@keyframes fade{from{opacity:0}}
 @keyframes draw{to{stroke-dashoffset:0}}@keyframes grow{from{transform:scaleX(0)}}@keyframes pulse{50%{opacity:.35}}@keyframes drift{to{transform:translate(-3rem,-2rem)}}
 @media(max-width:420px){.row{grid-template-columns:minmax(0,1fr)}.row .r{text-align:left}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.ln{stroke-dashoffset:0}}
 </style></head><body>
 <header class="top"><div><span class="brand">lotto<b>.</b>tracker</span>
-<div class="seg" aria-label="View"><i class="pill"></i><button data-v="overview">Overview</button><button data-v="history">History</button><button data-v="numbers">Numbers</button><button data-v="engine">Engine</button><button data-v="mynumbers">My Numbers</button></div>
+<div class="seg" aria-label="View"><i class="pill"></i><button data-v="overview">Overview</button><button data-v="history">History</button><button data-v="numbers">Numbers</button><button data-v="engine">Engine</button><button data-v="mynumbers">My Numbers</button><button data-v="settings">Settings</button></div>
 <div class="seg" aria-label="Game"><i class="pill"></i><button data-g="all">All</button><button data-g="ultra">Ultra</button><button data-g="super">Super</button></div></div></header>
 <main class="wrap" id="app" aria-live="polite"><p class="msg">loading results...</p></main>
 <footer>Win = 3+ of 6 matched. Charts apply your current sets to every recorded draw (a backtest, not your real bets); prizes for 4 and 5 matches are estimates from the Oct 25 payout table. Hot and cold numbers are descriptive only, every draw is independent. Amber ring = your personal numbers. Verify results with PCSO. Entertainment only.</footer>
 <script src="engine.js"></script>
 <script>
 const NAME={ultra:'Ultra Lotto 6/58',super:'Superlotto 6/49'},MAXN={ultra:58,super:49};
-let R,C,P,view='overview',game='all',pg=0;const PER=4,$=s=>document.querySelector(s);
+let R,C,P,EM,MSG='',view='overview',game='all',pg=0;const PER=4,$=s=>document.querySelector(s);
 const pad=n=>String(Number(n)).padStart(2,'0'),money=n=>(n<0?'-':'')+'PHP '+Math.abs(Math.round(n)).toLocaleString('en-US');
 const fm=(f,v)=>f==='m'?money(v):f==='p'?v.toFixed(1)+'%':f==='b'?Math.round(v)+'/6':Math.round(v);
 const balls=(a,h=[],mark)=>a.map((n,j)=>`<span class="n${h.includes(n)?' hit':''}${mark&&P.has(n)?' me':''}" style="--j:${j}">${pad(n)}</span>`).join('');
-Promise.all(['results.json','sets.json'].map(f=>fetch(f+'?'+Date.now()).then(r=>{if(!r.ok)throw 0;return r.json()}))).then(([a,b])=>{R=a.draws;C=b;P=new Set(b.personal||[]);render()}).catch(()=>$('#app').innerHTML='<p class="msg err">error: could not load results.json / sets.json</p>');
-document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;if(b.dataset.copy){navigator.clipboard.writeText(JSON.stringify(PICKS[b.dataset.copy]));b.textContent='Copied';return}if(b.dataset.v){view=b.dataset.v;pg=0}if(b.dataset.g){game=b.dataset.g;pg=0}if(b.dataset.pg)pg+=+b.dataset.pg;render()});
+const get=(f,opt)=>fetch(f+'?'+Date.now()).then(r=>{if(!r.ok)throw 0;return r.json()}).catch(e=>{if(opt)return{};throw e});
+Promise.all([get('results.json'),get('sets.json'),get('settings.json',1)]).then(([a,b,c])=>{R=a.draws;C=b;EM=Object.assign({draw:true,weekly:true,onlyWins:false},c.emails);try{const o=JSON.parse(localStorage.getItem('lotto-settings')||'null');if(o){Object.assign(C,o.c);EM=o.em}}catch(e){}P=new Set(C.personal||[]);render()}).catch(()=>$('#app').innerHTML='<p class="msg err">error: could not load results.json / sets.json</p>');
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;if(b.dataset.act){act(b.dataset.act);return}if(b.dataset.copy){navigator.clipboard.writeText(JSON.stringify(PICKS[b.dataset.copy]));b.textContent='Copied';return}if(b.dataset.v){view=b.dataset.v;pg=0}if(b.dataset.g){game=b.dataset.g;pg=0}if(b.dataset.pg)pg+=+b.dataset.pg;render()});
 addEventListener('resize',()=>pills());document.fonts&&document.fonts.ready.then(()=>pills());
 const ev=d=>C.sets[d.game].map(s=>{const hit=s.filter(n=>d.numbers.includes(n)),k=hit.length;return{s,hit,k,p:k>=3?(C.prizeEst[d.game][k]||0):0}});
 const chrono=()=>R.filter(d=>game==='all'||d.game===game).sort((a,b)=>a.date.localeCompare(b.date)||a.game.localeCompare(b.game));
@@ -80,7 +85,7 @@ function draw(d,i){return`<article class="card draw rise" style="--i:${i}"><div 
 function heat(g,gi){const ds=R.filter(d=>d.game===g).sort((a,b)=>a.date.localeCompare(b.date)),c={},last={};ds.forEach((d,i)=>d.numbers.forEach(n=>{c[n]=(c[n]||0)+1;last[n]=i}));const mx=Math.max(1,...Object.values(c)),all=[...Array(MAXN[g]).keys()].map(i=>i+1);
 const hot=all.filter(n=>c[n]).sort((a,b)=>c[b]-c[a]||a-b).slice(0,5),cold=all.slice().sort((a,b)=>(last[a]??-1)-(last[b]??-1)||a-b).slice(0,5);
 return`<section class="card rise" style="--i:${gi};margin-bottom:var(--space-md)"><h3>${NAME[g]} - ${ds.length} draws</h3><div class="heat">${all.map(n=>{const p=Math.round((c[n]||0)/mx*100);return`<span class="h${p>=50?' hi':''}${P.has(n)?' me':''}" style="--p:${p}%;--j:${n}" title="${pad(n)}: ${c[n]||0}x">${pad(n)}</span>`}).join('')}</div><dl class="kp" style="margin:0"><div><dt class="cap">most drawn</dt><dd>${hot.map(n=>pad(n)+'x'+c[n]).join(' ')}</dd></div><div><dt class="cap">unseen longest (draws)</dt><dd>${cold.map(n=>pad(n)+' ('+(ds.length-1-(last[n]??-1))+')').join(' ')}</dd></div></dl></section>`}
-function pills(){document.querySelectorAll('.seg').forEach(s=>{const b=s.querySelector('[aria-pressed=true]'),p=s.querySelector('.pill');if(b&&p){p.style.width=b.offsetWidth+'px';p.style.transform='translateX('+b.offsetLeft+'px)'}})}
+function pills(){document.querySelectorAll('.seg').forEach(s=>{const b=s.querySelector('[aria-pressed=true]'),p=s.querySelector('.pill');if(b&&p){p.style.width=b.offsetWidth+'px';p.style.transform='translateX('+b.offsetLeft+'px)';s.scrollLeft=b.offsetLeft-(s.clientWidth-b.offsetWidth)/2}})}
 function countUp(){const rm=matchMedia('(prefers-reduced-motion: reduce)').matches;document.querySelectorAll('[data-n]').forEach(el=>{const to=+el.dataset.n,f=el.dataset.f,t0=performance.now(),D=rm?0:900;(function step(t){const k=D?1:Math.min(1,(t-t0)/D);el.textContent=fm(f,to*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(step)})(t0)})}
 const PICKS={};
 function eng(){const gs=game==='all'?['ultra','super']:[game],A=gs.map(g=>[g,Engine.analyze(R.filter(d=>d.game===g).sort((a,b)=>a.date.localeCompare(b.date)),g,C,P)]),ok=A.every(([,a])=>a.p>=.05);
@@ -99,6 +104,28 @@ const m=ld?p.c.filter(n=>ld.numbers.includes(n)).length:0;
 h+=`<h3 class="rise" style="margin-top:var(--space-lg)">${NAME[g]}</h3><div class="g2">${C.sets[g].map((s,i)=>{const k=ld?s.filter(n=>ld.numbers.includes(n)).length:0;return`<div class="card rise" style="--i:${gi*8+i+1}"><p class="cap">Set ${'ABCDE'[i]}</p><div>${balls(s,ld?ld.numbers:[],1)}</div><small class="cap">latest draw (${ld?ld.date:'-'}): ${k}/6 matched</small></div>`}).join('')}
 <div class="card rise" style="--i:${gi*8+7};border-color:var(--color-accent)"><p class="cap">Engine pick</p><div>${balls(p.c,ld?ld.numbers:[],1)}</div><small class="cap">typical ${Math.round(p.t*100)}% &middot; sum ${p.sum} &middot; ${p.odd} odd &middot; ${p.pc} personal. Seeded by the ${ld?ld.date:''} draw, so it refreshes after each new draw. Would have matched ${m}/6 on it.</small><br><button class="btn" data-copy="${g}1" style="margin-top:var(--space-sm)">Copy as JSON</button></div></div>`});
 return h}
+const repo=()=>{const u=location.hostname.endsWith('.github.io')?location.hostname.split('.')[0]:'',r=location.pathname.split('/')[1];return u&&r?`https://github.com/${u}/${r}`:''};
+function collect(){const d={sets:{ultra:[],super:[]},prizeEst:JSON.parse(JSON.stringify(C.prizeEst))};
+document.querySelectorAll('input[data-s]').forEach(e=>{const[g,i,j]=e.dataset.s.split('.');(d.sets[g][i]??=[])[j]=+e.value});
+d.personal=$('#pn').value.split(/[ ,]+/).filter(Boolean).map(Number);d.costPerPlay=+$('#cp').value;
+document.querySelectorAll('input[data-p]').forEach(e=>{const[g,k]=e.dataset.p.split('.');d.prizeEst[g][k]=+e.value});
+d.emails={draw:$('#e1').checked,weekly:$('#e2').checked,onlyWins:$('#e3').checked};return d}
+function valid(d){const e=[];for(const g of['ultra','super'])d.sets[g].forEach((s,i)=>{if(s.length!==6||s.some(n=>!Number.isInteger(n)||n<1||n>MAXN[g])||new Set(s).size!==6)e.push(`${NAME[g]} set ${'ABCDE'[i]}: needs 6 different numbers from 1 to ${MAXN[g]}`)});
+if(d.personal.some(n=>!Number.isInteger(n)||n<1||n>58))e.push('Personal numbers: whole numbers from 1 to 58');if(!(d.costPerPlay>0))e.push('Cost per play must be above 0');return e}
+const exp=()=>({costPerPlay:C.costPerPlay,prize3:{ultra:C.prizeEst.ultra[3],super:C.prizeEst.super[3]},sets:C.sets,personal:C.personal,prizeEst:C.prizeEst});
+function copy(t,m){navigator.clipboard.writeText(JSON.stringify(t));MSG=m;render()}
+function act(a){if(a==='save'){const d=collect(),e=valid(d);if(e.length){MSG='Not saved: '+e.join('; ');render();return}
+Object.assign(C,{sets:d.sets,personal:d.personal,costPerPlay:d.costPerPlay,prizeEst:d.prizeEst});C.prize3={ultra:d.prizeEst.ultra[3],super:d.prizeEst.super[3]};EM=d.emails;P=new Set(d.personal);
+try{localStorage.setItem('lotto-settings',JSON.stringify({c:{sets:C.sets,personal:C.personal,costPerPlay:C.costPerPlay,prizeEst:C.prizeEst,prize3:C.prize3},em:EM}))}catch(x){}MSG='Saved in this browser. To change the emails and the next result alerts, copy the JSON into your repo (buttons below).';render()}
+else if(a==='reset'){try{localStorage.removeItem('lotto-settings')}catch(x){}location.reload()}
+else if(a==='csets')copy(exp(),'sets.json copied. Paste it over sets.json in your repo.');else if(a==='ccfg')copy({emails:EM},'settings.json copied. Paste it over settings.json in your repo.')}
+function settings(){const r=repo(),L=(p,t)=>r?`<a class="btn" href="${r}/${p}" target="_blank" rel="noopener">${t}</a>`:'';
+let h=`<section class="hero rise"><p class="cap">Settings</p><h1 class="W" style="font-size:clamp(2.25rem,10vw,4.25rem)">Your data</h1><p class="cap" style="max-width:38rem">Edits are saved in this browser and change every page here. Emails run on GitHub, so push changes to your repo with the copy buttons.</p>${MSG?`<p style="position:relative;z-index:1;margin-top:var(--space-md)" role="status">${MSG}</p>`:''}</section><div class="g2" style="margin-top:var(--space-md)">`;
+['ultra','super'].forEach((g,gi)=>{h+=`<section class="card rise" style="--i:${gi+1}"><h3>${NAME[g]}: my sets</h3>${C.sets[g].map((s,i)=>`<div class="fr"><span class="cap">${'ABCDE'[i]}</span>${s.map((n,j)=>`<input class="in" inputmode="numeric" maxlength="2" data-s="${g}.${i}.${j}" value="${pad(n)}" aria-label="${NAME[g]} set ${'ABCDE'[i]} number ${j+1}">`).join('')}</div>`).join('')}<p class="cap" style="margin-top:var(--space-sm)">Prize estimates (PHP)</p><div class="fr">${[3,4,5].map(k=>`<label class="cap">${k} of 6 <input class="tx" inputmode="decimal" data-p="${g}.${k}" value="${C.prizeEst[g][k]}"></label>`).join('')}</div></section>`});
+h+=`<section class="card rise" style="--i:3"><h3>General</h3><label class="cap">Personal numbers (comma separated)<input class="tx w" id="pn" value="${[...P].sort((a,b)=>a-b).join(', ')}"></label><label class="cap" style="display:block;margin-top:var(--space-sm)">Cost per play (PHP)<input class="tx" id="cp" inputmode="decimal" value="${C.costPerPlay}"></label></section>
+<section class="card rise" style="--i:4"><h3>Email alerts</h3><label class="ck"><input type="checkbox" id="e1" ${EM.draw?'checked':''}> After every draw</label><label class="ck"><input type="checkbox" id="e2" ${EM.weekly?'checked':''}> Weekly summary (Monday)</label><label class="ck"><input type="checkbox" id="e3" ${EM.onlyWins?'checked':''}> Only email me when I win</label></section>
+<section class="card rise" style="--i:5"><h3>Resend API key</h3><p class="cap">This page does not take your API key on purpose. A GitHub Pages site is public and runs in the browser, while the emails are sent by a GitHub Action, which can only read GitHub Secrets. Add these secrets: <b>RESEND_API_KEY</b>, <b>EMAIL_TO</b>, and optionally <b>EMAIL_FROM</b>.</p><div class="acts">${L('settings/secrets/actions/new','Add a secret')}<a class="btn" href="https://resend.com/api-keys" target="_blank" rel="noopener">Resend API keys</a>${L('actions/workflows/update.yml','Run a test')}</div>${r?'':'<p class="cap">Links appear once the site runs on github.io.</p>'}</section></div>
+<div class="acts"><button class="btn" data-act="save">Save</button><button class="btn" data-act="csets">Copy sets.json</button><button class="btn" data-act="ccfg">Copy settings.json</button>${L('edit/main/sets.json','Edit sets.json on GitHub')}${L('edit/main/settings.json','Edit settings.json on GitHub')}<button class="btn" data-act="reset">Reset to repo values</button></div>`;MSG='';return h}
 function render(){
 document.querySelectorAll('button[data-v]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===view));document.querySelectorAll('button[data-g]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.g===game));
 const ds=chrono(),app=$('#app');if(!ds.length){app.innerHTML='<p class="msg">no draws recorded yet</p>';pills();return}
@@ -112,6 +139,7 @@ else if(view==='history'){const hs=ds.slice().reverse(),pages=Math.ceil(hs.lengt
 h=hs.slice(pg*PER,pg*PER+PER).map(draw).join('')+`<div class="pager"><button class="btn" data-pg="-1" ${pg<=0?'disabled':''}>Prev</button><span>Page ${pg+1} of ${pages} &middot; ${hs.length} draws</span><button class="btn" data-pg="1" ${pg>=pages-1?'disabled':''}>Next</button></div>`}
 else if(view==='engine')h=eng();
 else if(view==='mynumbers')h=mynums();
+else if(view==='settings')h=settings();
 else h=(game==='all'?['ultra','super']:[game]).map(heat).join('')+'<p class="cap">Shade = how often drawn. Amber outline = your personal numbers.</p>';
 app.innerHTML=h;pills();countUp()}
 </script></body></html>
