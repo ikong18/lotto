@@ -1,4 +1,5 @@
 # Lotto Tracker (GitHub Pages)
+**Supabase:** run `schema.sql` (put your email in it), turn off public sign-ups (Auth > Providers > Email), fill `config.js` (URL + anon key), add Action secrets `SUPABASE_URL` and `SUPABASE_SERVICE_KEY`, then sign in on the Settings tab and press Upload repo data.
 Tracks all five PCSO majors (6/58, 6/55, 6/49, 6/45, 6/42). The Budget tab ranks games for your weekly budget by expected return, prize frequency or jackpot odds; set sets for the new games by adding them to `sets.json`.
 1. Upload these files to your repo (e.g. `hallmarks`). Settings > Pages > Deploy from branch > `main` / root. Site: `https://<user>.github.io/<repo>/`.
 2. Settings > Actions > General > Workflow permissions: **Read and write**.
