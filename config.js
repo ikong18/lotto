@@ -1,1 +1,1 @@
-window.SB={url:"",key:""}; // Supabase > Project Settings > API: Project URL and the anon public key (never the service_role key here)
+window.SB={url:"postgresql://postgres:[Ikong@choy12345]@db.ciwevvqtpzhywtnfzrrh.supabase.co:5432/postgres",key:""}; // Supabase > Project Settings > API: Project URL and the anon public key (never the service_role key here)
