@@ -1,27 +1,70 @@
-/* Analysis engine: pure mathematics. Nothing here can raise the odds of any ticket; it measures, tests and ranks. */
+/* Lotto Engine v2. Selection preferences and retrospective analysis, never predictions. */
 (function(){
-const erf=x=>{const s=Math.sign(x);x=Math.abs(x);const t=1/(1+.3275911*x);return s*(1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-.284496736)*t+.254829592)*t*Math.exp(-x*x))};
-const Phi=z=>.5*(1+erf(z/Math.SQRT2)),comb=(n,k)=>{let r=1;for(let i=1;i<=k;i++)r=r*(n-k+i)/i;return r};
+'use strict';
 const NN={ultra:58,grand:55,super:49,mega:45,lotto:42};
+const DAYS={ultra:[0,2,5],grand:[1,3,6],super:[0,2,4],mega:[1,3,5],lotto:[2,4,6]};
+const cache=new Map();
+const comb=(n,k)=>{if(k<0||k>n)return 0;let r=1;for(let i=1;i<=k;i++)r=r*(n-k+i)/i;return r};
 const rng=s=>()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
 const hash=s=>{let h=2166136261;for(const c of s)h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0};
-function typical(c,N){const s=c.reduce((a,b)=>a+b,0),z=(s-3*(N+1))/Math.sqrt(6*(N+1)*(N-6)/12),odd=c.filter(x=>x%2).length,bands=new Set(c.map(x=>Math.ceil(x/(N/5)))).size,cons=c.some((x,i)=>i&&x-c[i-1]===1);
-return{t:Math.exp(-z*z/2)*comb(6,odd)/20*Math.min(1,bands/4)*(cons?.85:1),sum:s,odd}}
-function analyze(ds,g,C,P){
-const N=NN[g],n=ds.length,pr=6/N,E=n*pr,cnt=Array(N+1).fill(0);ds.forEach(d=>d.numbers.forEach(x=>cnt[x]++));
-let chi=0;for(let i=1;i<=N;i++)chi+=E?(cnt[i]-E)**2/E:0;
-const df=N-1,p=n>=5?1-Phi((Math.cbrt(chi/df)-(1-2/(9*df)))/Math.sqrt(2/(9*df))):null,sd=Math.sqrt(n*pr*(1-pr));
-const zs=[...Array(N)].map((_,i)=>({n:i+1,c:cnt[i+1],z:sd?(cnt[i+1]-E)/sd:0})).sort((a,b)=>b.z-a.z);
-const tot=comb(N,6),pz=C.prizeEst[g],odds=[3,4,5,6].map(k=>({k,p:comb(6,k)*comb(N-6,6-k)/tot,prize:pz[k]||0}));
-const ev=odds.filter(o=>o.k<6).reduce((a,o)=>a+o.p*o.prize,0),evJ=ev+odds[3].p*odds[3].prize;
-let bt=null;if(n>8){let sum=0,m=0;for(let t=8;t<n;t++){const c=Array(N+1).fill(0);ds.slice(0,t).forEach(d=>d.numbers.forEach(x=>c[x]++));
-const pick=[...Array(N)].map((_,i)=>i+1).sort((a,b)=>c[b]-c[a]||a-b).slice(0,6);sum+=pick.filter(x=>ds[t].numbers.includes(x)).length;m++}
-const mean=sum/m,base=36/N,se=Math.sqrt(6*pr*(1-pr)*(N-6)/(N-1)/m);bt={mean,base,z:(mean-base)/se,n:m}}
-const post=i=>(cnt[i]+pr*40)/(n+40),rnd=rng(hash(g+(n?ds[n-1].date:''))),R=()=>1+Math.floor(rnd()*N);
-const score=c=>{c=c.slice().sort((a,b)=>a-b);const t=typical(c,N),pc=c.filter(x=>P.has(x)).length,low=c.filter(x=>x<=31).length,fi=c.reduce((a,x)=>a+post(x),0)/6/pr;
-return{c,v:t.t*(1-.08*Math.max(0,low-3))*(pc>=2&&pc<=3?1:.2)*(1+.05*(fi-1)),t:t.t,sum:t.sum,odd:t.odd,pc}};
-const found={};for(let r=0;r<60;r++){let c=[];while(c.length<6){const x=R();if(!c.includes(x))c.push(x)}let cur=score(c),best=cur;
-for(let i=0;i<500;i++){const nc=cur.c.slice();nc[Math.floor(rnd()*6)]=R();if(new Set(nc).size<6)continue;const s=score(nc);if(s.v>cur.v||rnd()<.02)cur=s;if(cur.v>best.v)best=cur}found[best.c.join()]=best}
-const picks=Object.values(found).sort((a,b)=>b.v-a.v).slice(0,5);
-return{n,chi,df,p,flags:zs.filter(a=>Math.abs(a.z)>2).length,expFlags:N*.0455,top:zs.slice(0,3),bot:zs.slice(-3).reverse(),odds,ev,evJ,bt,picks}}
-globalThis.Engine={analyze}})();
+function sample(N,rnd){const pool=Array.from({length:N},(_,i)=>i+1);for(let i=0;i<6;i++){const j=i+Math.floor(rnd()*(N-i));[pool[i],pool[j]]=[pool[j],pool[i]]}return pool.slice(0,6).sort((a,b)=>a-b)}
+const overlap=(a,b)=>a.filter(n=>b.includes(n)).length;
+const key=c=>c.slice().sort((a,b)=>a-b).join(',');
+const validLine=(c,N)=>Array.isArray(c)&&c.length===6&&new Set(c).size===6&&c.every(n=>Number.isInteger(n)&&n>=1&&n<=N);
+function clean(ds,g){const seen=new Map();let invalid=0,duplicates=0;
+for(const d of ds){if(d.game!==g||!validLine(d.numbers,NN[g])||!/^\d{4}-\d{2}-\d{2}$/.test(d.date)||!Number.isFinite(Date.parse(d.date))||new Date(d.date).toISOString().slice(0,10)!==d.date){invalid++;continue}
+if(seen.has(d.date)){duplicates++;continue}seen.set(d.date,{...d,numbers:d.numbers.slice().sort((a,b)=>a-b)})}
+return{ds:[...seen.values()].sort((a,b)=>a.date.localeCompare(b.date)),invalid,duplicates}}
+function describe(c,N,P){const sum=c.reduce((a,b)=>a+b,0),odd=c.filter(x=>x%2).length,spread=c[5]-c[0],pc=c.filter(x=>P.has(x)).length;
+const z=(sum-3*(N+1))/Math.sqrt(6*(N+1)*(N-6)/12),t=Math.exp(-z*z/2)*(odd>=2&&odd<=4?1:.6)*Math.min(1,spread/(N*.6));
+return{c:c.slice(),sum,odd,spread,pc,t,v:t}}
+function backtest(ds,N){const warmup=20;if(ds.length<=warmup)return null;
+const strategies=['frequency','recent','cold'].map(id=>({id,total:0,hits:0,best:0,trace:[]}));
+const counts=Array(N+1).fill(0);ds.slice(0,warmup).forEach(d=>d.numbers.forEach(x=>counts[x]++));
+for(let t=warmup;t<ds.length;t++){
+ const recent=Array(N+1).fill(0);ds.slice(Math.max(0,t-10),t).forEach(d=>d.numbers.forEach(x=>recent[x]++));
+ for(const s of strategies){const c=s.id==='recent'?recent:counts;
+ const line=Array.from({length:N},(_,i)=>i+1).sort((a,b)=>(s.id==='cold'?c[a]-c[b]:c[b]-c[a])||a-b).slice(0,6);
+ const matches=overlap(line,ds[t].numbers);s.total+=matches;s.hits+=matches>=3;s.best=Math.max(s.best,matches);s.trace.push({date:ds[t].date,line:line.slice().sort((a,b)=>a-b),matches})}
+ ds[t].numbers.forEach(x=>counts[x]++);
+}
+const n=ds.length-warmup,base=36/N,se=Math.sqrt(6*(6/N)*(1-6/N)*(N-6)/(N-1)/n);
+for(const s of strategies){s.mean=s.total/n;s.z=(s.mean-base)/se}
+return{n,base,mean:strategies[0].mean,z:strategies[0].z,strategies,warmup}}
+function analyze(raw,g,C,P=new Set()){
+const N=NN[g];if(!N)throw new Error('Unknown lotto game');
+const cleaned=clean(raw,g),ds=cleaned.ds,personal=[...P].filter(x=>Number.isInteger(x)&&x>0&&x<=N).sort((a,b)=>a-b);
+P=new Set(personal);const saved=(C.sets?.[g]||[]).filter(c=>validLine(c,N)),pz=C.prizeEst?.[g]||{};
+const signature=JSON.stringify([g,ds.map(d=>[d.date,d.numbers,d.jackpot,d.winners]),personal,saved,pz,cleaned.invalid,cleaned.duplicates]);
+if(cache.has(signature))return cache.get(signature);
+const seed=hash(JSON.stringify([g,ds.map(d=>[d.date,d.numbers]),personal,saved])),rnd=rng(seed),n=ds.length,pr=6/N,E=n*pr,cnt=Array(N+1).fill(0);
+ds.forEach(d=>d.numbers.forEach(x=>cnt[x]++));
+const chiOf=c=>E?c.slice(1).reduce((a,x)=>a+(x-E)**2/E,0):0,chi=chiOf(cnt),sd=Math.sqrt(n*pr*(1-pr));
+// Simulate draws without replacement. Sparse counts and within-draw dependence are retained.
+let p=null;const simulations=199;if(n>=20){let extreme=0;const sim=rng(hash('audit'+g+JSON.stringify(ds.map(d=>[d.date,d.numbers]))));
+for(let r=0;r<simulations;r++){const c=Array(N+1).fill(0);for(let i=0;i<n;i++)sample(N,sim).forEach(x=>c[x]++);if(chiOf(c)>=chi-1e-9)extreme++}p=(extreme+1)/(simulations+1)}
+const zs=Array.from({length:N},(_,i)=>({n:i+1,c:cnt[i+1],z:sd?(cnt[i+1]-E)/sd:0})).sort((a,b)=>b.z-a.z||a.n-b.n);
+const latest=ds.at(-1),total=comb(N,6),jackpot=latest?.jackpot??pz[6]??0;
+const odds=[3,4,5,6].map(k=>({k,p:comb(6,k)*comb(N-6,6-k)/total,prize:k===6?jackpot:pz[k]||0}));
+const ev=odds.filter(o=>o.k<6).reduce((a,o)=>a+o.p*o.prize,0),evJ=ev+odds[3].p*jackpot;
+// Start with uniform samples, then diversify the portfolio. No frequency weighting or win scores.
+const candidates=new Map(),excluded=new Set(saved.map(key));
+for(let i=0;i<1600;i++){const c=sample(N,rnd),k=key(c);if(!excluded.has(k))candidates.set(k,describe(c,N,P))}
+const pool=[...candidates.values()],picks=[];
+const labels=['Personal mix','Balanced spread','Spread option 3','Spread option 4','Spread option 5'];
+while(picks.length<5){let best=null,bestScore=-Infinity;
+ for(const candidate of pool){if(picks.includes(candidate)||picks.some(p=>overlap(p.c,candidate.c)>2))continue;
+ const used=new Set(picks.flatMap(p=>p.c)),fresh=candidate.c.filter(x=>!used.has(x)).length;
+ const preference=picks.length===0&&personal.length>=2?(candidate.pc>=2&&candidate.pc<=3?1:0):0;
+ const score=candidate.t+fresh*.45+preference*2;
+ if(score>bestScore){best=candidate;bestScore=score}}
+ if(!best)break;best.label=picks.length===0&&personal.length<2?'Balanced starter':labels[picks.length];picks.push(best)
+}
+const distinct=new Set(picks.flatMap(x=>x.c)).size,maxOverlap=Math.max(0,...picks.flatMap((p,i)=>picks.slice(i+1).map(q=>overlap(p.c,q.c))));
+let expected=0;if(n){for(let t=Date.parse(ds[0].date);t<=Date.parse(latest.date);t+=86400000)if(DAYS[g].includes(new Date(t).getUTCDay()))expected++}
+const result={n,chi,df:N-1,p,simulations:p===null?0:simulations,flags:zs.filter(a=>Math.abs(a.z)>2).length,expFlags:N*.0455,top:zs.slice(0,3),bot:zs.slice(-3).reverse(),odds,ev,evJ,bt:backtest(ds,N),picks,distinct,maxOverlap,
+ quality:{invalid:cleaned.invalid,duplicates:cleaned.duplicates,expected,missing:Math.max(0,expected-n),first:ds[0]?.date,last:latest?.date},seed};
+if(cache.size>=64)cache.delete(cache.keys().next().value);cache.set(signature,result);return result
+}
+globalThis.Engine={analyze,comb,validLine,overlap,version:'2.0'};
+})();

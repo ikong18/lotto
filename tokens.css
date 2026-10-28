@@ -8,3 +8,16 @@
 --text-sm:.8125rem;--text-md:.9375rem;--text-lg:1.25rem;--text-display:clamp(3.5rem,18vw,7.5rem);
 --ease-out:cubic-bezier(.2,.7,.2,1);--ease-in-out:cubic-bezier(.6,0,.2,1);--ease-spring:cubic-bezier(.34,1.56,.64,1);
 --dur-fast:140ms;--dur-base:240ms;--dur-slow:520ms;--rule-w:1px;--radius-sm:8px;--radius-lg:20px}
+/* Ticket workspace */
+.ticket-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,25rem),1fr));gap:16px;margin:16px 0 24px}
+.game-tickets{margin-top:32px;padding-top:24px;border-top:1px solid var(--color-rule)}
+.ticket{padding:20px;border:1px solid var(--color-rule);border-radius:16px;background:var(--color-card)}
+.ticket.selected{border:2px solid var(--color-accent);padding:19px;background:color-mix(in oklch,var(--color-accent) 7%,var(--color-card))}
+.ticket-tag{font:600 .7rem var(--font-body);letter-spacing:.06em;border:1px solid var(--color-rule);border-radius:6px;padding:5px 8px;white-space:nowrap;color:var(--color-mute)}
+.ticket-balls{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0}.ticket-balls .n{width:clamp(2.2rem,7vw,2.8rem);height:clamp(2.2rem,7vw,2.8rem);margin:0;font-size:1rem;animation:none}
+.ticket-footer{border-top:1px solid var(--color-rule);padding-top:12px}.ticket-footer .acts{margin-top:10px}
+.btn.chosen{background:var(--color-accent);color:var(--color-accent-ink);border-color:var(--color-accent)}
+.slip-panel{scroll-margin-top:160px}.slip-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 0;border-bottom:1px solid var(--color-rule)}
+.saved-sets summary{cursor:pointer;padding:12px 0;color:var(--color-mute);font-weight:600}
+.table-scroll{overflow-x:auto}.audit-table{width:100%;border-collapse:collapse;font-size:.8125rem;margin:12px 0}.audit-table th,.audit-table td{padding:12px 8px;border-bottom:1px solid var(--color-rule);text-align:left}.audit-table th{color:var(--color-mute)}
+@media(max-width:420px){.ticket{padding:14px}.ticket.selected{padding:13px}.slip-row{align-items:flex-start;flex-direction:column}.ticket-balls{gap:4px}.ticket-balls .n{width:2.2rem;height:2.2rem}.ticket-tag{font-size:.65rem}}
