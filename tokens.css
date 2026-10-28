@@ -21,3 +21,22 @@
 .saved-sets summary{cursor:pointer;padding:12px 0;color:var(--color-mute);font-weight:600}
 .table-scroll{overflow-x:auto}.audit-table{width:100%;border-collapse:collapse;font-size:.8125rem;margin:12px 0}.audit-table th,.audit-table td{padding:12px 8px;border-bottom:1px solid var(--color-rule);text-align:left}.audit-table th{color:var(--color-mute)}
 @media(max-width:420px){.ticket{padding:14px}.ticket.selected{padding:13px}.slip-row{align-items:flex-start;flex-direction:column}.ticket-balls{gap:4px}.ticket-balls .n{width:2.2rem;height:2.2rem}.ticket-tag{font-size:.65rem}}
+/* Receipt-style preview and isolated print output. */
+#receipt-preview{width:min(52rem,calc(100% - 24px));max-height:90dvh;padding:24px;border:1px solid var(--color-rule);border-radius:16px;background:var(--color-paper);color:var(--color-ink);overflow:auto}
+#receipt-preview::backdrop{background:rgb(0 0 0 / .75)}
+.receipt-toolbar,.receipt-controls{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.receipt-controls{margin-top:20px;align-items:end}.receipt-controls label{display:grid;gap:6px;font-size:.8125rem;flex:1;min-width:12rem}.receipt-controls .tx{width:100%;text-align:left;font-family:var(--font-body)}.receipt-print-help{margin:12px 0}
+.receipt-stage{padding:24px 8px;background:var(--color-paper-2);border-radius:12px}
+.receipt-paper{width:80mm;max-width:100%;margin:auto;padding:6mm 4mm;background:#fff;color:#111;font:11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;box-shadow:0 4px 24px #0003;color-scheme:light;overflow-wrap:anywhere}
+.receipt-paper p{margin:4px 0}.receipt-heading{text-align:center;border-bottom:1px dashed #555;padding-bottom:12px}.receipt-heading strong{font-size:20px;letter-spacing:.06em}.receipt-heading p{font-size:9px;line-height:1.6}.receipt-meta{padding:10px 0;border-bottom:1px dashed #555}.receipt-category{padding:12px 0 0}.receipt-category h3{margin:0;padding:0 0 6px;color:#111;font:700 13px/1.4 ui-monospace,monospace;text-transform:uppercase;border-bottom:1px solid #111}.receipt-line{padding:10px 0;border-bottom:1px dashed #aaa;break-inside:avoid}.receipt-between{display:flex;justify-content:space-between;gap:8px;align-items:baseline}.receipt-line .receipt-between:first-child{font-size:9px}.receipt-numbers{font-size:14px;font-weight:700;letter-spacing:-.035em;white-space:nowrap;padding:8px 0}.receipt-subtotal{font-weight:700;padding-top:8px;break-inside:avoid}.receipt-total{border-top:2px solid #111;border-bottom:2px solid #111;margin-top:16px;padding:10px 0;font-size:12px;break-inside:avoid}.receipt-note{font-size:9px;padding-top:8px}.receipt-bottom{text-align:center;border-top:1px dashed #555;margin-top:12px;padding-top:12px;font-size:9px;break-inside:avoid}.receipt-empty{text-align:center;padding:24px 0}
+@media(max-width:420px){#receipt-preview{padding:14px}.receipt-stage{padding:16px 0}.receipt-controls label{min-width:100%}.receipt-paper{padding:5mm 3mm}.receipt-numbers{font-size:13px}}
+@media print{
+ @page{size:auto;margin:8mm}
+ body.receipt-preview-open{margin:0!important;min-height:0!important;background:white!important;color:black!important;overflow:visible!important}
+ body.receipt-preview-open>*{display:none!important}
+ body.receipt-preview-open>#receipt-preview{display:block!important;position:static!important;inset:auto!important;width:auto!important;max-width:none!important;max-height:none!important;height:auto!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;overflow:visible!important;background:white!important;color:black!important}
+ #receipt-preview::backdrop{display:none!important}
+ #receipt-preview .receipt-toolbar,#receipt-preview .receipt-controls,#receipt-preview .receipt-print-help{display:none!important}
+ #receipt-preview .receipt-stage{display:block!important;padding:0!important;background:white!important;border-radius:0!important}
+ #receipt-preview .receipt-paper{width:80mm;max-width:100%;box-shadow:none!important;margin:0 auto;padding:0 3mm;overflow:visible;print-color-adjust:exact}
+ .receipt-category h3{break-after:avoid}.receipt-paper *{animation:none!important;transition:none!important}
+}
