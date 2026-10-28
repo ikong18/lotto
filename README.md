@@ -1,11 +1,25 @@
-# Lotto Tracker (GitHub Pages)
-**Supabase:** run `schema.sql` (put your email in it), turn off public sign-ups (Auth > Providers > Email), fill `config.js` (URL + anon key), add Action secrets `SUPABASE_URL` and `SUPABASE_SERVICE_KEY`, then sign in on the Settings tab and press Upload repo data.
-Tracks all five PCSO majors (6/58, 6/55, 6/49, 6/45, 6/42). The Budget tab ranks games for your weekly budget by expected return, prize frequency or jackpot odds; set sets for the new games by adding them to `sets.json`.
-1. Upload these files to your repo (e.g. `hallmarks`). Settings > Pages > Deploy from branch > `main` / root. Site: `https://<user>.github.io/<repo>/`.
-2. Settings > Actions > General > Workflow permissions: **Read and write**.
-3. Settings > Secrets and variables > Actions, add: `RESEND_API_KEY`, `EMAIL_TO` (your email), optional `EMAIL_FROM`.
-   Without a verified domain in Resend, the default sender `onboarding@resend.dev` can only email the address on your Resend account.
-4. Actions tab > "Update lotto results" > Run workflow once to test (mode `draw`, or `weekly` for the weekly email).
-- Schedule: after each draw (Tue/Thu/Fri/Sun ~9:30PM PH) it scrapes thesummitexpress.com, updates `results.json`, emails WIN/LOSE + results. Monday 9AM PH: weekly summary.
-- Edit your numbers in `sets.json`. If scraping breaks, add a draw by hand in `results.json` (`{"date","game":"ultra|super","numbers":[...],"notified":false}`) or use Run workflow with a date (`from` + `date` backfills a whole range, including real jackpot, winner counts and 5/4/3-match payouts). Optional per-draw fields: `jackpot`, `winners`, `prizes` (`{"5":[winners,php],...}`); the app uses real payouts when present.
-- Check the source site's terms before relying on the scraper.
+# Lotto Tracker
+
+A static, personal tracker for five PCSO major games: 6/58, 6/55, 6/49, 6/45 and 6/42.
+
+- Results and history use `results.json`; they are not a live PCSO feed.
+- Upcoming Picks shows repeatable combinations, the next scheduled draw in Philippine time, and clearly labeled prize estimates.
+- Settings edits all five games. Fill the blank six-number row to add a set; clear all numbers in a row to remove it. Changes save in this browser.
+- Overview backtests your current sets against recorded history; it does not represent actual bets.
+- Budget compares mathematical odds and estimated returns. No number selection method predicts an independent draw.
+
+## Run locally
+
+Run `python -m http.server 8000` in this directory and open http://localhost:8000. Run regression checks with `node tests.cjs`. No build or package installation is required.
+
+## GitHub Pages
+
+In repository Settings > Pages, deploy the `main` branch root. Update `results.json` manually with verified results. Each draw requires `date` (YYYY-MM-DD), `game` (ultra, grand, super, mega or lotto), and six unique in-range `numbers`. Optional fields are `jackpot`, `winners`, and `prizes` (for example, `"5": [winnerCount, payoutPerWinner]`).
+
+## Optional cloud and email integrations
+
+`config.js` accepts only the public HTTPS Supabase project URL and a public anon/publishable key. Never put a database password or service key in browser files. The previously committed database password must be rotated in Supabase; removing it from the latest file does not remove it from Git history.
+
+Cloud sync expects existing `draws`, `app_state`, and `bets` tables with appropriate access policies. This repository does not include their schema, so cloud sync needs separate setup and verification. Local tracking remains available if cloud configuration is missing or invalid.
+
+Email preference controls are retained for integration compatibility. This repository currently contains no updater, scraper or email workflow; these preferences do not send email by themselves.

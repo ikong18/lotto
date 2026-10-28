@@ -9,9 +9,9 @@ function typical(c,N){const s=c.reduce((a,b)=>a+b,0),z=(s-3*(N+1))/Math.sqrt(6*(
 return{t:Math.exp(-z*z/2)*comb(6,odd)/20*Math.min(1,bands/4)*(cons?.85:1),sum:s,odd}}
 function analyze(ds,g,C,P){
 const N=NN[g],n=ds.length,pr=6/N,E=n*pr,cnt=Array(N+1).fill(0);ds.forEach(d=>d.numbers.forEach(x=>cnt[x]++));
-let chi=0;for(let i=1;i<=N;i++)chi+=(cnt[i]-E)**2/E;
-const df=N-1,p=1-Phi((Math.cbrt(chi/df)-(1-2/(9*df)))/Math.sqrt(2/(9*df))),sd=Math.sqrt(n*pr*(1-pr));
-const zs=[...Array(N)].map((_,i)=>({n:i+1,c:cnt[i+1],z:(cnt[i+1]-E)/sd})).sort((a,b)=>b.z-a.z);
+let chi=0;for(let i=1;i<=N;i++)chi+=E?(cnt[i]-E)**2/E:0;
+const df=N-1,p=n>=5?1-Phi((Math.cbrt(chi/df)-(1-2/(9*df)))/Math.sqrt(2/(9*df))):null,sd=Math.sqrt(n*pr*(1-pr));
+const zs=[...Array(N)].map((_,i)=>({n:i+1,c:cnt[i+1],z:sd?(cnt[i+1]-E)/sd:0})).sort((a,b)=>b.z-a.z);
 const tot=comb(N,6),pz=C.prizeEst[g],odds=[3,4,5,6].map(k=>({k,p:comb(6,k)*comb(N-6,6-k)/tot,prize:pz[k]||0}));
 const ev=odds.filter(o=>o.k<6).reduce((a,o)=>a+o.p*o.prize,0),evJ=ev+odds[3].p*odds[3].prize;
 let bt=null;if(n>8){let sum=0,m=0;for(let t=8;t<n;t++){const c=Array(N+1).fill(0);ds.slice(0,t).forEach(d=>d.numbers.forEach(x=>c[x]++));
