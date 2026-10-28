@@ -2,7 +2,7 @@
 (function(){
 const erf=x=>{const s=Math.sign(x);x=Math.abs(x);const t=1/(1+.3275911*x);return s*(1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-.284496736)*t+.254829592)*t*Math.exp(-x*x))};
 const Phi=z=>.5*(1+erf(z/Math.SQRT2)),comb=(n,k)=>{let r=1;for(let i=1;i<=k;i++)r=r*(n-k+i)/i;return r};
-const NN={ultra:58,super:49};
+const NN={ultra:58,grand:55,super:49,mega:45,lotto:42};
 const rng=s=>()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
 const hash=s=>{let h=2166136261;for(const c of s)h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0};
 function typical(c,N){const s=c.reduce((a,b)=>a+b,0),z=(s-3*(N+1))/Math.sqrt(6*(N+1)*(N-6)/12),odd=c.filter(x=>x%2).length,bands=new Set(c.map(x=>Math.ceil(x/(N/5)))).size,cons=c.some((x,i)=>i&&x-c[i-1]===1);

@@ -1,4 +1,5 @@
 # Lotto Tracker (GitHub Pages)
+Tracks all five PCSO majors (6/58, 6/55, 6/49, 6/45, 6/42). The Budget tab ranks games for your weekly budget by expected return, prize frequency or jackpot odds; set sets for the new games by adding them to `sets.json`.
 1. Upload these files to your repo (e.g. `hallmarks`). Settings > Pages > Deploy from branch > `main` / root. Site: `https://<user>.github.io/<repo>/`.
 2. Settings > Actions > General > Workflow permissions: **Read and write**.
 3. Settings > Secrets and variables > Actions, add: `RESEND_API_KEY`, `EMAIL_TO` (your email), optional `EMAIL_FROM`.
