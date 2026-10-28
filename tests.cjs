@@ -110,3 +110,27 @@ if(plan.lines.length){
  `,ctx);
  console.log('Passed: due-time reminders, daily grouping, duplicate suppression and placed-line suppression.');
 }
+
+// Printing must use the saved numbers, group categories and exclude nonpending lines by default.
+vm.runInContext(fs.readFileSync('receipt.js','utf8'),ctx);
+vm.runInContext('PLAN_MARKS={};WEEKLY='+JSON.stringify(plan),ctx);
+const receiptNow=Date.parse(plan.generatedAt);
+const originalPlan=JSON.stringify(plan);
+const allReceipt=vm.runInContext('receiptMarkup(WEEKLY,receiptLines(WEEKLY,"all","all",'+receiptNow+'),"all",'+receiptNow+')',ctx);
+assert.equal((allReceipt.match(/class="receipt-category"/g)||[]).length,new Set(plan.lines.map(x=>x.game)).size);
+assert.ok(allReceipt.includes('PHP '+plan.totalCost.toFixed(2)));
+assert.ok(allReceipt.includes('NOT AN OFFICIAL LOTTERY TICKET'));
+for(const x of plan.lines)assert.ok(allReceipt.includes(x.numbers.slice().sort((a,b)=>a-b).map(n=>String(n).padStart(2,'0')).join(' - ')));
+if(plan.lines.length>1){
+ vm.runInContext('PLAN_MARKS['+JSON.stringify(plan.lines[0].id)+']="skip";PLAN_MARKS['+JSON.stringify(plan.lines[1].id)+']="placed";',ctx);
+ const upcoming=vm.runInContext('receiptLines(WEEKLY,"pending","all",'+receiptNow+')',ctx);
+ assert.ok(!upcoming.some(x=>x.id===plan.lines[0].id||x.id===plan.lines[1].id));
+ const category=plan.lines[0].game;
+ const filtered=vm.runInContext('receiptLines(WEEKLY,"all",'+JSON.stringify(category)+','+receiptNow+')',ctx);
+ assert.ok(filtered.every(x=>x.game===category));
+ const today=vm.runInContext('receiptLines(WEEKLY,"today","all",'+receiptNow+')',ctx);
+ assert.ok(today.every(x=>x.betAt.slice(0,10)===new Date(receiptNow+288e5).toISOString().slice(0,10)));
+}
+assert.equal(JSON.stringify(plan),originalPlan);
+assert.ok(vm.runInContext('receiptMarkup(WEEKLY,[],"pending")',ctx).includes('No lines match'));
+console.log('Passed: receipt category grouping, totals, saved numbers, scope/status filters and empty preview.');

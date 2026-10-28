@@ -66,3 +66,9 @@ Each line shows a suggested 7:00 PM betting time and scheduled 9:00 PM draw in *
 - **Reload saved plan** fetches the same server-selected numbers; it never regenerates them.
 
 The calendar uses UTC timestamps (converted from Philippine time), stable weekly/day event IDs and standard display alarms. No reminders or calendar entries are created in external accounts automatically.
+
+### Receipt-style print preview
+
+On Auto Plan, choose **Print receipt preview**. The 80 mm-style preview groups lines by game/category and includes suggested betting dates, draw dates, saved numbers, line costs, category subtotals and a grand total. It defaults to pending upcoming bets, excluding lines marked placed/skipped and expired draws. Choose today's pending bets, the full week (with each status clearly printed), or a particular game. The preview initially follows the page's selected game filter.
+
+**Print / Save PDF** opens the browser's print dialog. Only the receipt prints; app navigation and preview controls are hidden. Select the actual paper size in the printer dialog or save to PDF on ordinary paper. The receipt is a personal checklist, not an official lottery ticket. Printing does not regenerate numbers, purchase tickets or change placed/skip marks.
