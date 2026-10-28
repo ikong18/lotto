@@ -45,3 +45,24 @@ Design research (independent implementation; no source code copied):
 - [jhadev/lotto](https://github.com/jhadev/lotto): clear per-game number generation.
 - [jpdevpersonal/lotto-predictor](https://github.com/jpdevpersonal/lotto-predictor): chronological evaluation, explicit analysis status and comparison with a fair-draw baseline.
 - [yaotzin1/lotto-agent](https://github.com/yaotzin1/lotto-agent): reducing repetition across multiple lines and reporting portfolio structure. Historical pair-affinity claims were not adopted as evidence of predictive power.
+
+## Autonomous PHP 300 Weekly Auto Plan
+
+The **₱300 Auto Plan** tab is an independent, automatically selected plan for the five supported major games. At the repository's PHP 25 ordinary-line price, a full week selects 12 lines. Allocation proceeds in equal rounds across the games with randomly assigned extra slots, giving two or three lines per game in a full week. There is at most one line per game per scheduled draw. A partial week can spend less: only draw slots with a future suggested betting time are considered. Unused or skipped money is not rolled over, replaced or used to chase missed draws. The cap applies to this auto plan; manual bets must also fit within the user's real weekly budget and are not automatically deducted from it.
+
+`scripts/weekly_plan.py` uses Python's OS-backed `secrets.SystemRandom` to sample six distinct numbers uniformly. It does not read personal numbers, frequencies, birthdays, engine scores or previous winning combinations. It does not constrain parity, sums, consecutive numbers or portfolio overlap. Every valid combination is eligible. Randomly generated lines do not predict winning results.
+
+The existing scheduled Action creates the plan once each Philippine Monday–Sunday week (normally at the 7:20 AM check), saving `weekly-plan.json` and an immutable dated copy under `plans/`. Reruns reuse the week's saved plan, even if results or settings have changed. Deleting the current pointer recovers the archived plan instead of rerolling. The initial partial-week plan is included in this change. The Action saves a newly created plan even if the PCSO results source is temporarily unavailable, then reports the source failure. GitHub schedules can be delayed; running **Update lotto results** manually also prepares the week's plan.
+
+The UI shows selected cost, locally marked placed cost, pending reserve and unallocated/released funds. **Mark placed** and **Skip** are reversible local bookkeeping, not ticket purchases or cloud bet-log writes. Marks do not sync across devices; the selected numbers do. Results are compared automatically when a matching dated result exists, with plan-only comparisons clearly distinguished from tickets marked placed. Stored plans are never retargeted into another week or draw.
+
+### Betting dates and reminders
+
+Each line shows a suggested 7:00 PM betting time and scheduled 9:00 PM draw in **Asia/Manila**. These are planning times, not an official sales cut-off; verify the outlet's actual closing time and PCSO's schedule, especially holidays and cancellations.
+
+- **Copy today's bets / pending week** includes game, draw, numbers and cost.
+- **Download calendar reminders** exports the currently pending dates with 6:30 PM alarms. Import the ICS file into a calendar app and enable notifications there for closed-app reminders. Import each new week's file; imports do not automatically sync after skipping a line or a new plan generation. Remove obsolete calendar entries if plans/statuses change.
+- **Enable open-tab reminders** requests browser permission on click. The app checks once per minute, groups due lines by date, and suppresses repeat notices and lines marked placed/skipped. The same button pauses reminders. The page must remain open; browser throttling, platform support and notification settings can delay or prevent alerts. No background web-push or email delivery is configured.
+- **Reload saved plan** fetches the same server-selected numbers; it never regenerates them.
+
+The calendar uses UTC timestamps (converted from Philippine time), stable weekly/day event IDs and standard display alarms. No reminders or calendar entries are created in external accounts automatically.
