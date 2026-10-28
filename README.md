@@ -2,7 +2,7 @@
 
 A static, personal tracker for five PCSO major games: 6/58, 6/55, 6/49, 6/45 and 6/42.
 
-- Results and history use `results.json`; they are not a live PCSO feed.
+- Results and history use `results.json`, updated from the official PCSO results table by GitHub Actions. Open tabs check the committed feed every five minutes.
 - Upcoming Picks shows repeatable combinations, the next scheduled draw in Philippine time, and clearly labeled prize estimates.
 - Settings edits all five games. Fill the blank six-number row to add a set; clear all numbers in a row to remove it. Changes save in this browser.
 - Overview backtests your current sets against recorded history; it does not represent actual bets.
@@ -10,11 +10,15 @@ A static, personal tracker for five PCSO major games: 6/58, 6/55, 6/49, 6/45 and
 
 ## Run locally
 
-Run `python -m http.server 8000` in this directory and open http://localhost:8000. Run regression checks with `node tests.cjs`. No build or package installation is required.
+Run `python -m http.server 8000` in this directory and open http://localhost:8000. Run regression checks with `node tests.cjs` and `python -m unittest discover -s scripts -p 'test_*.py'`. No build or package installation is required.
 
 ## GitHub Pages
 
-In repository Settings > Pages, deploy the `main` branch root. Update `results.json` manually with verified results. Each draw requires `date` (YYYY-MM-DD), `game` (ultra, grand, super, mega or lotto), and six unique in-range `numbers`. Optional fields are `jackpot`, `winners`, and `prizes` (for example, `"5": [winnerCount, payoutPerWinner]`).
+In repository Settings > Pages, deploy the `main` branch root. The **Update lotto results** Action checks PCSO daily at 9:20, 10:20 and 11:20 PM, plus 7:20 AM Philippine time. Scheduled Actions may run late. Use Actions > Update lotto results > Run workflow for an immediate retry. It imports the recent rows PCSO exposes, preserves history, and fails without changing data if the source is unavailable or malformed. It does not backfill older missing dates beyond the source table. No API key is required. The workflow needs Contents write permission. Branch protection may require an exception for the updater.
+
+On GitHub Pages, the app reads the committed `main/results.json` feed directly, so bot commits do not depend on another Pages deployment. Cloud records are merged with the repository feed, with repository records taking precedence on matching dates. A network failure during a background refresh leaves the last successful results visible.
+
+You can also update `results.json` manually with verified results. Each draw requires `date` (YYYY-MM-DD), `game` (ultra, grand, super, mega or lotto), and six unique in-range `numbers`. Optional fields are `jackpot`, `winners`, and `prizes` (for example, `"5": [winnerCount, payoutPerWinner]`).
 
 ## Optional cloud and email integrations
 
@@ -22,4 +26,4 @@ In repository Settings > Pages, deploy the `main` branch root. Update `results.j
 
 Cloud sync expects existing `draws`, `app_state`, and `bets` tables with appropriate access policies. This repository does not include their schema, so cloud sync needs separate setup and verification. Local tracking remains available if cloud configuration is missing or invalid.
 
-Email preference controls are retained for integration compatibility. This repository currently contains no updater, scraper or email workflow; these preferences do not send email by themselves.
+Email preference controls are retained for integration compatibility. The results updater does not send email; these preferences do not send email by themselves.

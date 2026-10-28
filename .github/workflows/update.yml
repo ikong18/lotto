@@ -1,0 +1,36 @@
+name: Update lotto results
+on:
+  schedule:
+    # 9:20, 10:20, 11:20 PM and 7:20 AM Philippine time.
+    - cron: '20 13,14,15,23 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['scripts/update_results.py', '.github/workflows/update.yml']
+permissions:
+  contents: write
+concurrency:
+  group: lotto-results
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test importer
+        run: python -m unittest discover -s scripts -p 'test_*.py'
+      - name: Fetch official results
+        run: python scripts/update_results.py
+      - name: Commit updated results
+        run: |
+          if ! git diff --quiet -- results.json; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add results.json
+            git commit -m 'Update official PCSO results'
+            git push
+          fi
