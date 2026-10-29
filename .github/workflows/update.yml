@@ -22,8 +22,12 @@ jobs:
         with:
           python-version: '3.12'
       - name: Test importer
+        id: tests
+        continue-on-error: true
         run: python -m unittest discover -s scripts -p 'test_*.py'
       - name: Prepare immutable weekly plan
+        id: plan
+        continue-on-error: true
         run: python scripts/weekly_plan.py
       - name: Fetch official results
         id: results
@@ -38,6 +42,15 @@ jobs:
             git commit -m 'Update PCSO results and weekly plan'
             git push
           fi
-      - name: Report source failure after saving plan
-        if: steps.results.outcome == 'failure'
-        run: exit 1
+      - name: Sync draws to Supabase
+        id: sync
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python scripts/sync_supabase.py
+      - name: Report any failed step after saving what succeeded
+        if: contains(join(steps.*.outcome, ','), 'failure')
+        run: |
+          echo "tests=${{ steps.tests.outcome }} plan=${{ steps.plan.outcome }} results=${{ steps.results.outcome }} sync=${{ steps.sync.outcome }}"
+          exit 1

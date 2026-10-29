@@ -14,9 +14,20 @@ class ImporterTests(unittest.TestCase):
         self.assertEqual(rows[0]['numbers'],[55,12,48,22,38,40])
         self.assertEqual(rows[1]['game'],'super')
         self.assertEqual(rows[0]['jackpot'],449844291.78)
-    def test_invalid_page_and_numbers_fail(self):
-        for html in ['<html>Unavailable</html>',HTML.replace('55-12-48','55-55-48'),HTML.replace('55-12-48','59-12-48'),HTML.replace('10/27/2026','10/27/2027')]:
+    def test_invalid_page_and_all_bad_rows_fail(self):
+        for html in ['<html>Unavailable</html>',HTML.replace('10/27/2026','10/27/2027')]:
             with self.assertRaises(ValueError):self.parse(html)
+    def test_one_bad_row_is_skipped_not_fatal(self):
+        for bad in ['55-55-48','59-12-48']:
+            skipped=[];rows=parse_results(HTML.replace('55-12-48',bad),date(2026,10,28),skipped)
+            self.assertEqual([r['game'] for r in rows],['super']);self.assertEqual(len(skipped),1)
+        skipped=[];rows=parse_results(HTML.replace('449,844,291.78','n/a'),date(2026,10,28),skipped)
+        self.assertEqual(len(rows),1);self.assertEqual(len(skipped),1)
+    def test_conflicting_duplicate_keeps_first(self):
+        dup=HTML.replace('</table>','<tr><td>Ultra Lotto 6/58</td><td>01-02-03-04-05-06</td><td>10/27/2026</td><td>1</td><td>0</td></tr></table>')
+        skipped=[];rows=parse_results(dup,date(2026,10,28),skipped)
+        ultra=[r for r in rows if r['game']=='ultra'];self.assertEqual(len(ultra),1)
+        self.assertEqual(ultra[0]['numbers'],[55,12,48,22,38,40]);self.assertEqual(len(skipped),1)
     def test_merge_preserves_history_prizes_and_notification(self):
         incoming=self.parse();old={'draws':[{**incoming[0],'notified':True,'prizes':{'3':[12,100]}},{'date':'2026-01-01','game':'lotto','numbers':[1,2,3,4,5,6]}]}
         original=copy.deepcopy(old);result=merge_results(old,incoming)

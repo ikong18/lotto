@@ -27,26 +27,38 @@ class Rows(HTMLParser):
         elif tag == 'tr' and self.row is not None:
             self.rows.append(self.row); self.row = None
 
-def parse_results(html, today=None):
+def parse_row(cells, today):
+    """Parse one 5-cell PCSO table row; return None for non-major games."""
+    match = re.search(r'6/(58|55|49|45|42)\b', cells[0])
+    if not match: return None
+    game, maximum = GAMES[match[0]]
+    numbers = [int(n) for n in re.split(r'\s*[-–]\s*', cells[1])]
+    day = datetime.strptime(cells[2], '%m/%d/%Y').date()
+    jackpot = float(cells[3].replace(',', '').replace('₱', '').strip())
+    winners = int(cells[4].replace(',', ''))
+    if (len(numbers) != 6 or len(set(numbers)) != 6 or
+        any(n < 1 or n > maximum for n in numbers) or
+        not math.isfinite(jackpot) or jackpot < 0 or winners < 0 or day > today):
+        raise ValueError(f'Invalid PCSO row: {game} {day}')
+    return dict(date=day.isoformat(), game=game, numbers=numbers,
+                jackpot=jackpot, winners=winners, source=SOURCE)
+
+def parse_results(html, today=None, skipped=None):
+    """Return every valid major-game row. A malformed row is skipped (and recorded in
+    `skipped`) instead of aborting the whole import; no valid rows at all still fails."""
+    today = today or date.today()
     parser = Rows(); parser.feed(html); draws = {}
+    skipped = skipped if skipped is not None else []
     for cells in parser.rows:
         if len(cells) != 5: continue
-        match = re.search(r'6/(58|55|49|45|42)\b', cells[0])
-        if not match: continue
-        game, maximum = GAMES[match[0]]
-        numbers = [int(n) for n in re.split(r'\s*[-–]\s*', cells[1])]
-        day = datetime.strptime(cells[2], '%m/%d/%Y').date()
-        jackpot = float(cells[3].replace(',', '').replace('₱', '').strip())
-        winners = int(cells[4].replace(',', ''))
-        if (len(numbers) != 6 or len(set(numbers)) != 6 or
-            any(n < 1 or n > maximum for n in numbers) or
-            not math.isfinite(jackpot) or jackpot < 0 or winners < 0 or
-            day > (today or date.today())):
-            raise ValueError(f'Invalid PCSO row: {game} {day}')
-        row = dict(date=day.isoformat(), game=game, numbers=numbers,
-                   jackpot=jackpot, winners=winners, source=SOURCE)
-        key = (row['date'], game)
-        if key in draws and draws[key] != row: raise ValueError('Conflicting PCSO rows')
+        try:
+            row = parse_row(cells, today)
+        except (ValueError, IndexError) as error:
+            skipped.append(f'{cells[0]} | {cells[2]}: {error}'); continue
+        if row is None: continue
+        key = (row['date'], row['game'])
+        if key in draws and draws[key] != row:
+            skipped.append(f'{row["game"]} {row["date"]}: conflicting duplicate row ignored'); continue
         draws[key] = row
     if not draws: raise ValueError('No major-game results found; refusing to overwrite data')
     return list(draws.values())
@@ -72,7 +84,9 @@ def main():
             except Exception:
                 if attempt == 2: raise
                 time.sleep(2 ** attempt)
-    incoming = parse_results(html)
+    skipped = []
+    incoming = parse_results(html, skipped=skipped)
+    for note in skipped: print('WARNING skipped row -', note)
     old = json.loads(args.output.read_text())
     merged = merge_results(old, incoming)
     if merged != old:

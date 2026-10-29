@@ -134,3 +134,42 @@ if(plan.lines.length>1){
 assert.equal(JSON.stringify(plan),originalPlan);
 assert.ok(vm.runInContext('receiptMarkup(WEEKLY,[],"pending")',ctx).includes('No lines match'));
 console.log('Passed: receipt category grouping, totals, saved numbers, scope/status filters and empty preview.');
+{const html=vm.runInContext(`(()=>{R=${JSON.stringify(JSON.parse(fs.readFileSync('results.json')).draws)};C=${JSON.stringify(config)};P=new Set(C.personal);const out={};
+ UPD=new Date(Date.now()-3*864e5).toISOString();out.old=stale();UPD=new Date(Date.now()-3600e3).toISOString();out.fresh=stale();UPD=undefined;out.none=stale();return out})()`,ctx);
+assert.ok(html.old.includes('No new results saved since'));assert.equal(html.fresh,'');assert.equal(html.none,'');
+console.log('Passed: stale-results banner appears only after 48 hours without an update.');}
+(async()=>{
+const calls=[],opened=[],store=new Map(),feed={draws:[{date:'2026-10-28',game:'grand',numbers:[1,2,3,4,5,6]},{date:'2026-10-28',game:'mega',numbers:[7,8,9,10,11,12]}],updatedAt:'2026-10-29T13:30:00Z'};
+let runs=[{status:'completed',conclusion:'success',created_at:new Date().toISOString()}],dispatch=204;
+const fake=async(url,opt={})=>{calls.push({url,opt});
+ if(url.includes('/dispatches'))return{status:dispatch,ok:dispatch===204};
+ if(url.includes('/runs'))return{ok:true,status:200,json:async()=>({workflow_runs:runs})};
+ if(url.includes('results.json'))return{ok:true,json:async()=>feed};
+ return{ok:false,json:async()=>({})}};
+const c2={...ctx,fetch:fake,setTimeout,window:{open:(u)=>opened.push(u)},localStorage:{getItem:k=>store.get(k)??null,setItem:(k,v)=>store.set(k,v),removeItem:k=>store.delete(k)}};
+vm.createContext(c2);for(const f of ['tickets.js','planner.js'])vm.runInContext(fs.readFileSync(f,'utf8'),c2);vm.runInContext(script,c2);
+const reset=()=>{calls.length=0;opened.length=0;vm.runInContext(`C=${JSON.stringify(config)};R=[];EM={draw:true,weekly:true,onlyWins:false};P=new Set(C.personal);UPD=undefined;UMSG='';UBUSY=false;POLL=0;view='results'`,c2)};
+const run=code=>vm.runInContext(code,c2),msg=()=>run('UMSG');
+// 1. no token: opens the Actions page, never calls the GitHub API
+reset();await run('runUpdate()');
+assert.deepEqual(opened,['https://github.com/ikong18/lotto/actions/workflows/update.yml']);assert.equal(calls.length,0);assert.match(msg(),/No GitHub token/);
+// 2. Refresh now merges only new draws and reports the count
+reset();await run('doRefresh()');assert.match(msg(),/Loaded 2 new draws/);assert.equal(run('R.length'),2);assert.equal(run('UPD'),feed.updatedAt);
+await run('doRefresh()');assert.match(msg(),/Already up to date/);assert.equal(run('R.length'),2);
+// 3. token: dispatches main, waits for the run, then reloads
+store.set('lotto-gh-token','tok123');reset();await run('runUpdate()');
+const d=calls.find(x=>x.url.includes('/dispatches'));assert.ok(d.url.startsWith('https://api.github.com/repos/ikong18/lotto/'));assert.equal(d.opt.method,'POST');assert.equal(JSON.parse(d.opt.body).ref,'main');
+assert.equal(d.opt.headers.Authorization,'Bearer tok123');assert.match(msg(),/Updater finished\. Loaded 2 new draws/);assert.equal(run('UBUSY'),false);
+// 4. failed run is reported with the conclusion, and the token is rejected cleanly
+reset();runs=[{status:'completed',conclusion:'failure',created_at:new Date().toISOString()}];await run('runUpdate()');assert.match(msg(),/finished with "failure"/);
+reset();dispatch=403;await run('runUpdate()');assert.match(msg(),/refused the token/);assert.equal(calls.some(x=>x.url.includes('/runs')),false);
+// 5. token save/remove only touches this browser's storage; a run from before the click is ignored
+store.clear();reset();assert.equal(run('ghTok()'),'');run("U.gtclear()");assert.equal(store.size,0);
+reset();dispatch=204;runs=[{status:'completed',conclusion:'success',created_at:'2020-01-01T00:00:00Z'}];store.set('lotto-gh-token','t');run('POLL=0');
+await run('runUpdate()');assert.match(msg(),/still running/);
+// 6. the buttons and the token card are actually rendered
+reset();run("view='results';render()");assert.ok(app.innerHTML.includes('data-act="refresh"')&&app.innerHTML.includes('data-act="runupdate"')&&app.innerHTML.includes('id="umsg"'));
+run("view='settings';render()");assert.ok(app.innerHTML.includes('data-act="gtclear"')&&!app.innerHTML.includes('data-act="gtsave"'));
+store.clear();run('render()');assert.ok(app.innerHTML.includes('Run updater (GitHub token)')&&app.innerHTML.includes('data-act="gtsave"')&&!app.innerHTML.includes('tok123'));
+console.log('Passed: manual refresh, token-less Actions link, workflow dispatch with run tracking, failure and rejected-token messages.');
+})().catch(e=>{console.error(e);process.exitCode=1});
