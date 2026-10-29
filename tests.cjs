@@ -134,3 +134,7 @@ if(plan.lines.length>1){
 assert.equal(JSON.stringify(plan),originalPlan);
 assert.ok(vm.runInContext('receiptMarkup(WEEKLY,[],"pending")',ctx).includes('No lines match'));
 console.log('Passed: receipt category grouping, totals, saved numbers, scope/status filters and empty preview.');
+{const html=vm.runInContext(`(()=>{R=${JSON.stringify(JSON.parse(fs.readFileSync('results.json')).draws)};C=${JSON.stringify(config)};P=new Set(C.personal);const out={};
+ UPD=new Date(Date.now()-3*864e5).toISOString();out.old=stale();UPD=new Date(Date.now()-3600e3).toISOString();out.fresh=stale();UPD=undefined;out.none=stale();return out})()`,ctx);
+assert.ok(html.old.includes('No new results saved since'));assert.equal(html.fresh,'');assert.equal(html.none,'');
+console.log('Passed: stale-results banner appears only after 48 hours without an update.');}

@@ -24,7 +24,11 @@ You can also update `results.json` manually with verified results. Each draw req
 
 `config.js` accepts only the public HTTPS Supabase project URL and a public anon/publishable key. Never put a database password or service key in browser files. The previously committed database password must be rotated in Supabase; removing it from the latest file does not remove it from Git history.
 
-Cloud sync expects existing `draws`, `app_state`, and `bets` tables with appropriate access policies. This repository does not include their schema, so cloud sync needs separate setup and verification. Local tracking remains available if cloud configuration is missing or invalid.
+Cloud tables: `supabase/schema.sql` is a reference schema for `draws`, `app_state` and `bets` with row-level security (public read of draws, owner-only writes). Replace `OWNER_EMAIL_HERE`, compare it with any existing tables, then run it in the Supabase SQL editor. Local tracking remains available if cloud configuration is missing or invalid.
+
+Automatic draw sync: after each update the workflow runs `scripts/sync_supabase.py`, which upserts every draw in `results.json` into `draws` (idempotent, keyed on `date,game`). Add two repository secrets (Settings > Secrets and variables > Actions): `SUPABASE_URL` (the project URL) and `SUPABASE_SERVICE_ROLE_KEY` (Project Settings > API > service_role). The service-role key bypasses RLS, so it belongs only in GitHub Secrets, never in `config.js`. Without the secrets the step is skipped. Sets, budget and the bet log still sync from the browser, which requires signing in under Settings > Cloud.
+
+Failure handling: a malformed PCSO row is skipped and logged instead of aborting the import, and a failure in the tests, weekly plan, PCSO fetch or Supabase sync no longer blocks the other steps; the run still ends red so GitHub notifies you. If `results.json` has not changed for 48 hours the Results tab shows a warning banner.
 
 Email preference controls are retained for integration compatibility. The results updater does not send email; these preferences do not send email by themselves.
 
