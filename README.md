@@ -18,6 +18,8 @@ In repository Settings > Pages, deploy the `main` branch root. The **Update lott
 
 On GitHub Pages, the app reads the committed `main/results.json` feed directly, so bot commits do not depend on another Pages deployment. Cloud records are merged with the repository feed, with repository records taking precedence on matching dates. A network failure during a background refresh leaves the last successful results visible.
 
+Manual update from the page: the Results tab has **Refresh now** (reloads `results.json` and the weekly plan immediately) and **Run updater**. Without a token, Run updater opens the Actions page so you can press Run workflow. If you save a fine-grained GitHub token under Settings (this repository only, Actions: read and write only, short expiry), the button starts the workflow itself, follows the run, and reloads the results when it finishes. The token stays in this browser's storage and is only sent to api.github.com. The browser cannot read PCSO directly (no CORS), so the Action does the fetching.
+
 You can also update `results.json` manually with verified results. Each draw requires `date` (YYYY-MM-DD), `game` (ultra, grand, super, mega or lotto), and six unique in-range `numbers`. Optional fields are `jackpot`, `winners`, and `prizes` (for example, `"5": [winnerCount, payoutPerWinner]`).
 
 ## Optional cloud and email integrations
