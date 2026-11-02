@@ -531,7 +531,7 @@
         30,
         16
       ],
-      "jackpot": 15000000.0,
+      "jackpot": 15000000,
       "winners": 0,
       "source": "https://www.pcso.gov.ph/SearchLottoResult.aspx"
     },
@@ -579,7 +579,173 @@
       "jackpot": 449844291.78,
       "winners": 0,
       "source": "https://www.pcso.gov.ph/SearchLottoResult.aspx"
+    },
+    {
+      "date": "2026-10-28",
+      "game": "grand",
+      "numbers": [
+        36,
+        21,
+        16,
+        26,
+        49,
+        13
+      ],
+      "jackpot": 312102304.83,
+      "winners": 0,
+      "source": "https://www.thesummitexpress.com/2026/10/pcso-lotto-result-today-october-28-2026.html",
+      "verifiedSources": [
+        "https://www.thesummitexpress.com/2026/10/pcso-lotto-result-today-october-28-2026.html",
+        "https://www.bolahan.com/lotto-result-october-28-2026/"
+      ]
+    },
+    {
+      "date": "2026-10-28",
+      "game": "mega",
+      "numbers": [
+        19,
+        40,
+        37,
+        1,
+        14,
+        29
+      ],
+      "jackpot": 15000000,
+      "winners": 0,
+      "source": "https://www.thesummitexpress.com/2026/10/pcso-lotto-result-today-october-28-2026.html",
+      "verifiedSources": [
+        "https://www.thesummitexpress.com/2026/10/pcso-lotto-result-today-october-28-2026.html",
+        "https://www.bolahan.com/lotto-result-october-28-2026/"
+      ]
+    },
+    {
+      "date": "2026-10-29",
+      "game": "lotto",
+      "numbers": [
+        34,
+        15,
+        19,
+        37,
+        25,
+        38
+      ],
+      "jackpot": 21694699.03,
+      "winners": 1,
+      "source": "https://www.thesummitexpress.com/2026/10/pcso-lotto-result-today-october-29-2026.html",
+      "verifiedSources": [
+        "https://www.thesummitexpress.com/2026/10/pcso-lotto-result-today-october-29-2026.html",
+        "https://lottotayo.ph/results/october-29-2026"
+      ]
+    },
+    {
+      "date": "2026-10-29",
+      "game": "super",
+      "numbers": [
+        44,
+        12,
+        20,
+        31,
+        35,
+        19
+      ],
+      "jackpot": 74930008.99,
+      "winners": 0,
+      "source": "https://www.thesummitexpress.com/2026/10/pcso-lotto-result-today-october-29-2026.html",
+      "verifiedSources": [
+        "https://www.thesummitexpress.com/2026/10/pcso-lotto-result-today-october-29-2026.html",
+        "https://lottotayo.ph/results/october-29-2026"
+      ]
+    },
+    {
+      "date": "2026-10-30",
+      "game": "mega",
+      "numbers": [
+        9,
+        37,
+        34,
+        18,
+        27,
+        44
+      ],
+      "jackpot": 15000000,
+      "winners": 0,
+      "source": "https://www.pcso.gov.ph/SearchLottoResult.aspx"
+    },
+    {
+      "date": "2026-10-30",
+      "game": "ultra",
+      "numbers": [
+        51,
+        57,
+        35,
+        54,
+        29,
+        45
+      ],
+      "jackpot": 460911837.34,
+      "winners": 0,
+      "source": "https://www.pcso.gov.ph/SearchLottoResult.aspx"
+    },
+    {
+      "date": "2026-10-31",
+      "game": "grand",
+      "numbers": [
+        42,
+        30,
+        21,
+        17,
+        20,
+        1
+      ],
+      "jackpot": 319543684.84,
+      "winners": 0,
+      "source": "https://www.pcso.gov.ph/SearchLottoResult.aspx"
+    },
+    {
+      "date": "2026-10-31",
+      "game": "lotto",
+      "numbers": [
+        16,
+        40,
+        7,
+        18,
+        41,
+        3
+      ],
+      "jackpot": 10000000,
+      "winners": 1,
+      "source": "https://www.pcso.gov.ph/SearchLottoResult.aspx"
+    },
+    {
+      "date": "2026-11-01",
+      "game": "super",
+      "numbers": [
+        44,
+        16,
+        40,
+        19,
+        27,
+        32
+      ],
+      "jackpot": 78612615.5,
+      "winners": 0,
+      "source": "https://www.pcso.gov.ph/SearchLottoResult.aspx"
+    },
+    {
+      "date": "2026-11-01",
+      "game": "ultra",
+      "numbers": [
+        14,
+        34,
+        54,
+        18,
+        5,
+        46
+      ],
+      "jackpot": 468922422.1,
+      "winners": 0,
+      "source": "https://www.pcso.gov.ph/SearchLottoResult.aspx"
     }
   ],
-  "updatedAt": "2026-10-28T06:41:43.125622+00:00"
+  "updatedAt": "2026-11-02T02:31:31.755713+00:00"
 }
