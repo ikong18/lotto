@@ -16,8 +16,8 @@ const html=fs.readFileSync('index.html','utf8');
 const script=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)][0][1];
 new vm.Script(script);
 const app={innerHTML:''};
-const ctx={Engine,location:{hostname:"localhost",pathname:"/"},console,Date,Set,Math,JSON,Number,String,Array,Object,Promise,URL,window:{},document:{querySelector:()=>app,querySelectorAll:()=>[],addEventListener:()=>{}},fetch:()=>new Promise(()=>{}),addEventListener:()=>{},setInterval:()=>{},matchMedia:()=>({matches:true}),localStorage:{},requestAnimationFrame:()=>{}};
-vm.createContext(ctx);vm.runInContext(fs.readFileSync('tickets.js','utf8'),ctx);vm.runInContext(fs.readFileSync('planner.js','utf8'),ctx);vm.runInContext(script,ctx);
+const ctx={Engine,AbortController,setTimeout:(fn,ms)=>{const t=setTimeout(fn,ms);t.unref();return t},clearTimeout,location:{hostname:"localhost",pathname:"/"},console,Date,Set,Math,JSON,Number,String,Array,Object,Promise,URL,window:{},document:{querySelector:()=>app,querySelectorAll:()=>[],addEventListener:()=>{}},fetch:()=>new Promise(()=>{}),addEventListener:()=>{},setInterval:()=>{},matchMedia:()=>({matches:true}),localStorage:{},requestAnimationFrame:()=>{}};
+vm.createContext(ctx);vm.runInContext(fs.readFileSync('feed.js','utf8'),ctx);vm.runInContext(fs.readFileSync('tickets.js','utf8'),ctx);vm.runInContext(fs.readFileSync('planner.js','utf8'),ctx);vm.runInContext(script,ctx);
 vm.runInContext(`C=${JSON.stringify(config)}; R=[]; EM={draw:true,weekly:true,onlyWins:false}; P=new Set(C.personal);`,ctx);
 for(const recorded of [[],JSON.parse(fs.readFileSync('results.json')).draws]){
 vm.runInContext('R='+JSON.stringify(recorded),ctx);
@@ -57,7 +57,7 @@ console.log('Passed: portfolio diversity, exact odds, audit calibration, holdout
 (async()=>{
 const memory=new Map(),clipboard=[];
 const localStorage={getItem:k=>memory.get(k)||null,setItem:(k,v)=>memory.set(k,v)};
-const build=()=>{const ui={innerHTML:''};const context={...ctx,testApp:ui,document:{...ctx.document,querySelector:()=>ui},localStorage,navigator:{clipboard:{writeText:async t=>clipboard.push(t)}}};vm.createContext(context);vm.runInContext(fs.readFileSync('tickets.js','utf8'),context);vm.runInContext(fs.readFileSync('planner.js','utf8'),context);vm.runInContext(script,context);vm.runInContext(`C=${JSON.stringify(config)};R=[];EM={};P=new Set(C.personal);view='mynumbers';game='all';render();`,context);return context};
+const build=()=>{const ui={innerHTML:''};const context={...ctx,testApp:ui,document:{...ctx.document,querySelector:()=>ui},localStorage,navigator:{clipboard:{writeText:async t=>clipboard.push(t)}}};vm.createContext(context);vm.runInContext(fs.readFileSync('feed.js','utf8'),context);vm.runInContext(fs.readFileSync('tickets.js','utf8'),context);vm.runInContext(fs.readFileSync('planner.js','utf8'),context);vm.runInContext(script,context);vm.runInContext(`C=${JSON.stringify(config)};R=[];EM={};P=new Set(C.personal);view='mynumbers';game='all';render();`,context);return context};
 const first=build();
 await vm.runInContext(`ticketAction('toggle',[...TICKETS.keys()][0])`,first);
 assert.equal(JSON.parse(memory.get('lotto-slip-v1')).length,1);
@@ -134,10 +134,13 @@ if(plan.lines.length>1){
 assert.equal(JSON.stringify(plan),originalPlan);
 assert.ok(vm.runInContext('receiptMarkup(WEEKLY,[],"pending")',ctx).includes('No lines match'));
 console.log('Passed: receipt category grouping, totals, saved numbers, scope/status filters and empty preview.');
-{const html=vm.runInContext(`(()=>{R=${JSON.stringify(JSON.parse(fs.readFileSync('results.json')).draws)};C=${JSON.stringify(config)};P=new Set(C.personal);const out={};
- UPD=new Date(Date.now()-3*864e5).toISOString();out.old=stale();UPD=new Date(Date.now()-3600e3).toISOString();out.fresh=stale();UPD=undefined;out.none=stale();return out})()`,ctx);
-assert.ok(html.old.includes('No new results saved since'));assert.equal(html.fresh,'');assert.equal(html.none,'');
-console.log('Passed: stale-results banner appears only after 48 hours without an update.');}
+{
+vm.runInContext('R='+JSON.stringify(JSON.parse(fs.readFileSync('results.json')).draws)+';game="all"',ctx);
+assert.equal(vm.runInContext('missingLatest(Date.parse("2026-11-02T12:00:00+08:00")).length',ctx),0);
+vm.runInContext('R=R.filter(x=>x.game!=="grand")',ctx);
+assert.ok(vm.runInContext('missingLatest(Date.parse("2026-11-02T12:00:00+08:00")).includes("grand")',ctx));
+console.log('Passed: freshness checks each game against its own published draw schedule.');
+}
 (async()=>{
 const calls=[],opened=[],store=new Map(),feed={draws:[{date:'2026-10-28',game:'grand',numbers:[1,2,3,4,5,6]},{date:'2026-10-28',game:'mega',numbers:[7,8,9,10,11,12]}],updatedAt:'2026-10-29T13:30:00Z'};
 let runs=[{status:'completed',conclusion:'success',created_at:new Date().toISOString()}],dispatch=204;
@@ -147,7 +150,7 @@ const fake=async(url,opt={})=>{calls.push({url,opt});
  if(url.includes('results.json'))return{ok:true,json:async()=>feed};
  return{ok:false,json:async()=>({})}};
 const c2={...ctx,fetch:fake,setTimeout,window:{open:(u)=>opened.push(u)},localStorage:{getItem:k=>store.get(k)??null,setItem:(k,v)=>store.set(k,v),removeItem:k=>store.delete(k)}};
-vm.createContext(c2);for(const f of ['tickets.js','planner.js'])vm.runInContext(fs.readFileSync(f,'utf8'),c2);vm.runInContext(script,c2);
+vm.createContext(c2);for(const f of ['feed.js','tickets.js','planner.js'])vm.runInContext(fs.readFileSync(f,'utf8'),c2);vm.runInContext(script,c2);
 const reset=()=>{calls.length=0;opened.length=0;vm.runInContext(`C=${JSON.stringify(config)};R=[];EM={draw:true,weekly:true,onlyWins:false};P=new Set(C.personal);UPD=undefined;UMSG='';UBUSY=false;POLL=0;view='results'`,c2)};
 const run=code=>vm.runInContext(code,c2),msg=()=>run('UMSG');
 // 1. no token: opens the Actions page, never calls the GitHub API
@@ -155,7 +158,7 @@ reset();await run('runUpdate()');
 assert.deepEqual(opened,['https://github.com/ikong18/lotto/actions/workflows/update.yml']);assert.equal(calls.length,0);assert.match(msg(),/No GitHub token/);
 // 2. Refresh now merges only new draws and reports the count
 reset();await run('doRefresh()');assert.match(msg(),/Loaded 2 new draws/);assert.equal(run('R.length'),2);assert.equal(run('UPD'),feed.updatedAt);
-await run('doRefresh()');assert.match(msg(),/Already up to date/);assert.equal(run('R.length'),2);
+await run('doRefresh()');assert.match(msg(),/Reloaded saved results/);assert.equal(run('R.length'),2);
 // 3. token: dispatches main, waits for the run, then reloads
 store.set('lotto-gh-token','tok123');reset();await run('runUpdate()');
 const d=calls.find(x=>x.url.includes('/dispatches'));assert.ok(d.url.startsWith('https://api.github.com/repos/ikong18/lotto/'));assert.equal(d.opt.method,'POST');assert.equal(JSON.parse(d.opt.body).ref,'main');
