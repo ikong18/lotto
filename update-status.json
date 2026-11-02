@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-11-02T10:44:39.438008+08:00",
+  "status": "ok",
+  "mode": "cross-checked fallback",
+  "missingDraws": [],
+  "conflicts": [],
+  "notes": [],
+  "latestByGame": {
+    "ultra": "2026-11-01",
+    "grand": "2026-10-31",
+    "super": "2026-11-01",
+    "mega": "2026-10-30",
+    "lotto": "2026-10-31"
+  }
+}

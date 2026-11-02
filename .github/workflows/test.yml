@@ -19,3 +19,7 @@ jobs:
           python-version: '3.12'
       - run: node tests.cjs
       - run: python -m unittest discover -s scripts -p 'test_*.py'
+      - run: node feed-tests.cjs
+      - name: Verify public fallback sources from the GitHub runner (read-only)
+        if: github.event_name == 'pull_request'
+        run: python scripts/update_results.py --force-fallback --dry-run
