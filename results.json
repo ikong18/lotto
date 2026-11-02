@@ -745,7 +745,47 @@
       "jackpot": 468922422.1,
       "winners": 0,
       "source": "https://www.pcso.gov.ph/SearchLottoResult.aspx"
+    },
+    {
+      "date": "2026-11-02",
+      "game": "grand",
+      "numbers": [
+        45,
+        43,
+        7,
+        53,
+        25,
+        48
+      ],
+      "jackpot": 326053355.61,
+      "winners": 0,
+      "source": "https://lottotayo.ph/results/november-2-2026",
+      "verifiedSources": [
+        "https://lottotayo.ph/results/november-2-2026",
+        "https://www.thesummitexpress.com/2026/11/pcso-lotto-result-today-november-2-2026.html"
+      ],
+      "verification": "two-source agreement"
+    },
+    {
+      "date": "2026-11-02",
+      "game": "mega",
+      "numbers": [
+        11,
+        2,
+        26,
+        7,
+        44,
+        5
+      ],
+      "jackpot": 15000000.0,
+      "winners": 1,
+      "source": "https://lottotayo.ph/results/november-2-2026",
+      "verifiedSources": [
+        "https://lottotayo.ph/results/november-2-2026",
+        "https://www.thesummitexpress.com/2026/11/pcso-lotto-result-today-november-2-2026.html"
+      ],
+      "verification": "two-source agreement"
     }
   ],
-  "updatedAt": "2026-11-02T02:31:31.755713+00:00"
+  "updatedAt": "2026-11-03T06:22:39.224111+08:00"
 }
