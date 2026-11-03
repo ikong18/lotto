@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-03T11:57:08.761068+08:00",
+  "checkedAt": "2026-11-04T04:09:40.233782+08:00",
   "status": "ok",
   "mode": "cross-checked fallback",
   "missingDraws": [],
@@ -8,10 +8,10 @@
     "PCSO unavailable: HTTPError 403"
   ],
   "latestByGame": {
-    "ultra": "2026-11-01",
+    "ultra": "2026-11-03",
     "grand": "2026-11-02",
-    "super": "2026-11-01",
+    "super": "2026-11-03",
     "mega": "2026-11-02",
-    "lotto": "2026-10-31"
+    "lotto": "2026-11-03"
   }
 }

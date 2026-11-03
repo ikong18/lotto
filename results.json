@@ -785,7 +785,67 @@
         "https://www.thesummitexpress.com/2026/11/pcso-lotto-result-today-november-2-2026.html"
       ],
       "verification": "two-source agreement"
+    },
+    {
+      "date": "2026-11-03",
+      "game": "lotto",
+      "numbers": [
+        35,
+        41,
+        8,
+        28,
+        19,
+        27
+      ],
+      "jackpot": 10000000.0,
+      "winners": 0,
+      "source": "https://lottotayo.ph/results/november-3-2026",
+      "verifiedSources": [
+        "https://lottotayo.ph/results/november-3-2026",
+        "https://www.thesummitexpress.com/2026/11/pcso-lotto-result-today-november-3-2026.html"
+      ],
+      "verification": "two-source agreement"
+    },
+    {
+      "date": "2026-11-03",
+      "game": "super",
+      "numbers": [
+        22,
+        8,
+        19,
+        36,
+        20,
+        44
+      ],
+      "jackpot": 82569686.42,
+      "winners": 0,
+      "source": "https://lottotayo.ph/results/november-3-2026",
+      "verifiedSources": [
+        "https://lottotayo.ph/results/november-3-2026",
+        "https://www.thesummitexpress.com/2026/11/pcso-lotto-result-today-november-3-2026.html"
+      ],
+      "verification": "two-source agreement"
+    },
+    {
+      "date": "2026-11-03",
+      "game": "ultra",
+      "numbers": [
+        16,
+        55,
+        1,
+        6,
+        27,
+        14
+      ],
+      "jackpot": 478298684.14,
+      "winners": 0,
+      "source": "https://lottotayo.ph/results/november-3-2026",
+      "verifiedSources": [
+        "https://lottotayo.ph/results/november-3-2026",
+        "https://www.thesummitexpress.com/2026/11/pcso-lotto-result-today-november-3-2026.html"
+      ],
+      "verification": "two-source agreement"
     }
   ],
-  "updatedAt": "2026-11-03T06:22:39.224111+08:00"
+  "updatedAt": "2026-11-04T04:09:40.233782+08:00"
 }
