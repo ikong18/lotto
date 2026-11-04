@@ -1,8 +1,17 @@
 {
-  "checkedAt": "2026-11-04T11:02:40.828422+08:00",
-  "status": "ok",
+  "checkedAt": "2026-11-05T04:27:33.502141+08:00",
+  "status": "degraded",
   "mode": "cross-checked fallback",
-  "missingDraws": [],
+  "missingDraws": [
+    {
+      "date": "2026-11-04",
+      "game": "grand"
+    },
+    {
+      "date": "2026-11-04",
+      "game": "mega"
+    }
+  ],
   "conflicts": [],
   "notes": [
     "PCSO unavailable: HTTPError 403"
