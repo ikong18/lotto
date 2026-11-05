@@ -1,7 +1,7 @@
 {
-  "checkedAt": "2026-11-05T11:33:26.358500+08:00",
+  "checkedAt": "2026-11-06T04:42:54.081673+08:00",
   "status": "degraded",
-  "mode": "cross-checked fallback",
+  "mode": "unavailable",
   "missingDraws": [
     {
       "date": "2026-11-04",
@@ -10,6 +10,14 @@
     {
       "date": "2026-11-04",
       "game": "mega"
+    },
+    {
+      "date": "2026-11-05",
+      "game": "lotto"
+    },
+    {
+      "date": "2026-11-05",
+      "game": "super"
     }
   ],
   "conflicts": [],
