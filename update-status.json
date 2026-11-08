@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-08T02:05:40.886621+08:00",
+  "checkedAt": "2026-11-08T10:33:24.346513+08:00",
   "status": "degraded",
   "mode": "unavailable",
   "missingDraws": [
@@ -39,7 +39,10 @@
   "conflicts": [],
   "notes": [
     "PCSO unavailable: HTTPError 403",
-    "https://www.thesummitexpress.com/2026/11/pcso-lotto-result-today-november-5-2026.html: HTTPError"
+    "https://www.thesummitexpress.com/2026/11/pcso-lotto-result-today-november-4-2026.html: HTTPError",
+    "https://www.thesummitexpress.com/2026/11/pcso-lotto-result-today-november-5-2026.html: HTTPError",
+    "https://www.thesummitexpress.com/2026/11/pcso-lotto-result-today-november-6-2026.html: HTTPError",
+    "https://www.thesummitexpress.com/2026/11/pcso-lotto-result-today-november-7-2026.html: HTTPError"
   ],
   "latestByGame": {
     "ultra": "2026-11-03",
