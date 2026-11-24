@@ -1,21 +1,9 @@
 {
-  "checkedAt": "2026-11-24T09:00:41.270276+08:00",
+  "checkedAt": "2026-11-25T07:05:35.913403+08:00",
   "status": "degraded",
   "mode": "unavailable",
   "missingDraws": [
     {
-      "date": "2026-11-17",
-      "game": "lotto"
-    },
-    {
-      "date": "2026-11-17",
-      "game": "super"
-    },
-    {
-      "date": "2026-11-17",
-      "game": "ultra"
-    },
-    {
       "date": "2026-11-18",
       "game": "grand"
     },
@@ -62,6 +50,18 @@
     {
       "date": "2026-11-23",
       "game": "mega"
+    },
+    {
+      "date": "2026-11-24",
+      "game": "lotto"
+    },
+    {
+      "date": "2026-11-24",
+      "game": "super"
+    },
+    {
+      "date": "2026-11-24",
+      "game": "ultra"
     }
   ],
   "conflicts": [],
